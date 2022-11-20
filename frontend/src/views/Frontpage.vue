@@ -12,6 +12,11 @@
                 Control View
             </a>
         </div>
+        <div id="select-view-wrapper">
+            <a class="select-view" href="/?page=hardware">
+                Hardware
+            </a>
+        </div>
     </div>
 </template>
 

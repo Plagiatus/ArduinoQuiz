@@ -2,9 +2,10 @@
 import { defineComponent } from 'vue';
 import FrontPage from './views/Frontpage.vue';
 import GameView from './views/GameView.vue';
+import Hardware from './views/Hardware.vue';
 
 export default defineComponent({
-  components: { FrontPage, GameView },
+  components: { FrontPage, GameView, Hardware },
   data(){
     return {
       hostname: "" as String,
@@ -25,5 +26,6 @@ export default defineComponent({
 
 <template>
   <GameView v-if="page=='view'" :control-view="controlView.valueOf()" :display-only="displayOnly.valueOf()"/>
+  <Hardware v-if="page=='hardware'"/>
   <FrontPage v-if="page==''"/>
 </template>
