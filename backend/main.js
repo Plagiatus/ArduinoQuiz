@@ -30,6 +30,7 @@ const express_1 = __importDefault(require("express"));
 const socket_io_1 = require("socket.io");
 const http = __importStar(require("http"));
 const serialport_1 = require("serialport");
+const process_1 = require("process");
 const app = (0, express_1.default)();
 const server = http.createServer(app);
 const io = new socket_io_1.Server(server, { cors: { origin: "*" } });
@@ -40,15 +41,24 @@ io.on("connection", (socket) => {
         socket.broadcast.emit(event, data);
     });
 });
-const serialPort = new serialport_1.SerialPort({ baudRate: 9600, path: "COM1" });
-const serialParser = new serialport_1.ReadlineParser({ delimiter: "\n" });
-// serialPort.on("")
-serialParser.on("data", (data) => {
-    try {
-        console.log("got data", data);
-        io.emit("hardware", JSON.parse(data));
+setupArduinoCommunication();
+function setupArduinoCommunication() {
+    if (!process_1.argv[2]) {
+        console.warn("\x1b[30m\x1b[43m%s\x1b[0m", "  WARNING: No parameter found for arduino path. No connection established.");
+        return;
     }
-    catch (error) {
-        console.error(error);
-    }
-});
+    const serialPort = new serialport_1.SerialPort({ baudRate: 9600, path: process_1.argv[2] });
+    const serialParser = serialPort.pipe(new serialport_1.ReadlineParser({ delimiter: "\n" }));
+    serialPort.on("open", () => {
+        console.log("Arduino communication opened.");
+    });
+    serialParser.on("data", (data) => {
+        try {
+            console.log("got data", data);
+            io.emit("hardware", JSON.parse(data));
+        }
+        catch (error) {
+            console.error(error);
+        }
+    });
+}
