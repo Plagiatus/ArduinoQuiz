@@ -23,6 +23,8 @@
   --btn-background: #1a1a1a;
   --red: #dd2e44;
   --red-light: rgba(221, 46, 68, 0.4);
+  
+  --text-color-filter: brightness(0) saturate(100%) invert(94%) sepia(100%) saturate(0%) hue-rotate(169deg) brightness(104%) contrast(109%);
   --red-filter: brightness(0) saturate(100%) invert(21%) sepia(88%) saturate(2183%) hue-rotate(337deg) brightness(108%) contrast(84%);
 }
 

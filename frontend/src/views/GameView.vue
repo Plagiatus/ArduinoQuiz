@@ -1,6 +1,7 @@
 <template>
     <div id="gameview">
-        <div id="player-wrapper" v-if="isFirstCome || isLockout" :style="{fontSize: `clamp(1em, calc(8vw / ${gameData.players.length}), 4em)` }">
+        <div id="player-wrapper" v-if="isFirstCome || isLockout"
+            :style="{ fontSize: `clamp(1em, calc(8vw / ${gameData.players.length}), 4em)` }">
             <div class="player" v-for="player of     gameData.players">
                 <div class="player-status" :class="{ locked: player.locked, active: player.active }"
                     :style="{ width: dimensionsBasedOnPlayer, height: dimensionsBasedOnPlayer }">
@@ -17,10 +18,15 @@
             </div>
         </div>
         <div id="controls-wrapper" v-if="!displayOnly">
+            <ToggleButton :text="'Fullscreen'" :enabled="inFullscreen" @click="toggleFullscreen" />
             <ToggleButton :text="'Show Points'" :enabled="pointsVisible" @click="togglePointsVisibility" />
             <button @click="newGame">New Game</button>
         </div>
         <!-- <KeyboardControls v-if="controlView || showKeyboardControls" /> -->
+        <button id="fullscreen-btn">
+            <img src="/fullscreen.svg" alt="Fullscreen" v-if="!inFullscreen" @click="toggleFullscreen" >
+            <img src="/fullscreen_exit.svg" alt="Exit Fullscreen" v-if="inFullscreen" @click="toggleFullscreen" >
+        </button>
     </div>
 </template>
 
@@ -45,6 +51,7 @@ export default defineComponent({
             showKeyboardControls: false,
             hasRecievedNewData: false,
             pointsVisible: true,
+            inFullscreen: false,
         }
     },
     methods: {
@@ -106,6 +113,14 @@ export default defineComponent({
             console.log("hardware", data);
         },
         togglePointsVisibility() { this.pointsVisible = !this.pointsVisible },
+        toggleFullscreen() {
+            this.inFullscreen = !this.inFullscreen
+            if(this.inFullscreen){
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        },
     },
     computed: {
         isFirstCome(): boolean {
@@ -137,9 +152,6 @@ export default defineComponent({
         Socket.socketListen("hardware", this.handleHardwareCommands);
         this.initGameData();
 
-        if (!this.displayOnly) {
-            window.addEventListener("keydown", this.keyControls);
-        }
     },
 });
 </script>
@@ -159,6 +171,7 @@ code {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+    gap: 2px;
 }
 
 .player {
@@ -209,5 +222,16 @@ input[type="number"] {
     -webkit-appearance: textfield;
     -moz-appearance: textfield;
     appearance: textfield;
+}
+
+#fullscreen-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 0.5em;
+    padding: 0.1em;
+}
+#fullscreen-btn > img {
+    filter: var(--text-color-filter);
 }
 </style>
