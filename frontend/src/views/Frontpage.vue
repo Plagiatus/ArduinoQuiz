@@ -60,4 +60,10 @@ export default defineComponent({
 .select-view:hover {
     scale: 1.1;
 }
+
+@media screen and (max-width: 850px) {
+    #select-view-wrapper {
+        flex-direction: column;
+    }
+}
 </style>
