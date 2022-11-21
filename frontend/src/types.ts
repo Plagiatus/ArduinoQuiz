@@ -12,8 +12,7 @@ export interface Player {
 }
 
 export enum GameType {
-    FIRST_COME = 1,
-    LOCKOUT,
+    SIMPLE = 1,
     FAMILYFEUD,
 }
 

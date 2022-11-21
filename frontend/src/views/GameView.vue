@@ -1,6 +1,6 @@
 <template>
     <div id="gameview">
-        <div id="player-wrapper" v-if="isFirstCome || isLockout"
+        <div id="player-wrapper" v-if="isSimple"
             :style="{ fontSize: `clamp(1em, calc(8vw / ${gameData.players.length}), 4em)` }">
             <div class="player" v-for="player of gameData.players" :style="{ width: dimensionsBasedOnPlayer }">
                 <div class="player-status" :class="{ locked: player.locked, active: player.active }"
@@ -21,6 +21,7 @@
             <ToggleButton :text="'Fullscreen'" :enabled="inFullscreen" @click="toggleFullscreen" />
             <ToggleButton :text="'Show Points'" :enabled="pointsVisible" @click="togglePointsVisibility" />
             <button @click="newGame">New Game</button>
+            <button @click="switchToNextGametype">Switch to {{ nextGameType }}</button>
         </div>
         <!-- <KeyboardControls v-if="controlView || showKeyboardControls" /> -->
         <button id="fullscreen-btn">
@@ -121,13 +122,16 @@ export default defineComponent({
                 document.exitFullscreen();
             }
         },
+        switchToNextGametype() {
+            this.gameData.type++;
+            if(this.gameData.type > Object.keys(GameType).length / 2){
+                this.gameData.type = 1;
+            }
+        }
     },
     computed: {
-        isFirstCome(): boolean {
-            return this.gameData.type === GameType.FIRST_COME;
-        },
-        isLockout(): boolean {
-            return this.gameData.type === GameType.LOCKOUT;
+        isSimple(): boolean {
+            return this.gameData.type === GameType.SIMPLE;
         },
         isFamilyFeud(): boolean {
             return this.gameData.type === GameType.FAMILYFEUD;
@@ -135,6 +139,15 @@ export default defineComponent({
         dimensionsBasedOnPlayer(): string {
             let amtPlayers = this.gameData.players.length;
             return Math.floor(90 / amtPlayers) + "vw";
+        },
+        nextGameType(): string {
+            switch (this.gameData.type) {
+                case GameType.SIMPLE:
+                    return "Family Feud"
+                case GameType.FAMILYFEUD:
+                    return "Simple"
+            }
+            return "";
         },
     },
     watch: {
