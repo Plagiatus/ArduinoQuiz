@@ -20,6 +20,7 @@
 
   --text-color: rgba(255, 255, 255, 0.87);
   --bg-color: #242424;
+  --bg-color2: #2b2a33;
   --btn-background: #1a1a1a;
   --red: #dd2e44;
   --red-light: rgba(221, 46, 68, 0.4);
@@ -79,6 +80,10 @@ button:focus-visible {
   text-align: center;
   width: 100%;
   min-height: 100vh;
+}
+
+input {
+  background-color: var(--bg-color2);
 }
 
 @media (prefers-color-scheme: light) {

@@ -2,7 +2,7 @@
     <div id="gameview">
         <div id="player-wrapper" v-if="isFirstCome || isLockout"
             :style="{ fontSize: `clamp(1em, calc(8vw / ${gameData.players.length}), 4em)` }">
-            <div class="player" v-for="player of     gameData.players">
+            <div class="player" v-for="player of gameData.players" :style="{ width: dimensionsBasedOnPlayer }">
                 <div class="player-status" :class="{ locked: player.locked, active: player.active }"
                     :style="{ width: dimensionsBasedOnPlayer, height: dimensionsBasedOnPlayer }">
                     <img class="player-status-locked" src="/close.svg" v-if="player.locked">
@@ -24,8 +24,8 @@
         </div>
         <!-- <KeyboardControls v-if="controlView || showKeyboardControls" /> -->
         <button id="fullscreen-btn">
-            <img src="/fullscreen.svg" alt="Fullscreen" v-if="!inFullscreen" @click="toggleFullscreen" >
-            <img src="/fullscreen_exit.svg" alt="Exit Fullscreen" v-if="inFullscreen" @click="toggleFullscreen" >
+            <img src="/fullscreen.svg" alt="Fullscreen" v-if="!inFullscreen" @click="toggleFullscreen">
+            <img src="/fullscreen_exit.svg" alt="Exit Fullscreen" v-if="inFullscreen" @click="toggleFullscreen">
         </button>
     </div>
 </template>
@@ -66,7 +66,7 @@ export default defineComponent({
             let playerAmount = NaN;
             let gameType = 0;
 
-            playerAmount = 2;
+            playerAmount = 3;
             gameType = 1;
 
             while (isNaN(playerAmount) || playerAmount <= 1) {
@@ -115,7 +115,7 @@ export default defineComponent({
         togglePointsVisibility() { this.pointsVisible = !this.pointsVisible },
         toggleFullscreen() {
             this.inFullscreen = !this.inFullscreen
-            if(this.inFullscreen){
+            if (this.inFullscreen) {
                 document.documentElement.requestFullscreen();
             } else {
                 document.exitFullscreen();
@@ -159,6 +159,9 @@ export default defineComponent({
 <style>
 #gameview {
     padding: 2em;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
 }
 
 code {
@@ -178,11 +181,12 @@ code {
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-width: 10vw;
+    max-width: 50vh;
 }
 
 .player-status {
     border: 10px solid white;
-    border-radius: .375rem;
     margin-bottom: 1em;
     min-height: 10vw;
     min-width: 10vw;
@@ -216,6 +220,7 @@ code {
     display: block;
     width: 100%;
     margin-bottom: 0.2em;
+    background-color: var(--bg-color2);
 }
 
 input[type="number"] {
@@ -231,7 +236,12 @@ input[type="number"] {
     margin: 0.5em;
     padding: 0.1em;
 }
-#fullscreen-btn > img {
+
+#fullscreen-btn>img {
     filter: var(--text-color-filter);
+}
+
+#controls-wrapper {
+    flex-grow: 1;
 }
 </style>
