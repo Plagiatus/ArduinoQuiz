@@ -87,7 +87,7 @@ export default defineComponent({
             let playerAmount = NaN;
             let gameType = 0;
 
-            playerAmount = 3;
+            playerAmount = 4;
             gameType = 1;
 
             while (isNaN(playerAmount) || playerAmount <= 1) {
@@ -101,7 +101,8 @@ export default defineComponent({
                 timeout: 0,
                 //@ts-ignore
                 type: GameType[GameType[gameType]],
-                players: []
+                players: [],
+                data: undefined,
             }
             for (let i: number = 0; i < playerAmount; i++) {
                 this.gameData.players.push({ active: false, locked: false, points: 0, name: "" });
@@ -149,7 +150,7 @@ export default defineComponent({
             if(this.gameData.type > Object.keys(GameType).length / 2){
                 this.gameData.type = 1;
             }
-        }
+        },
     },
     computed: {
         isSimple(): boolean {
