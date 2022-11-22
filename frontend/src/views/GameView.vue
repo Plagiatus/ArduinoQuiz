@@ -2,10 +2,11 @@
     <div id="gameview">
         <div id="player-wrapper" v-if="isSimple"
             :style="{ fontSize: `clamp(1em, calc(8vw / ${gameData.players.length}), 4em)` }">
-            <div class="player" v-for="player of gameData.players" :style="{ width: dimensionsBasedOnPlayer }">
-                <div class="player-status" :class="{ locked: player.locked, active: player.active }"
+            <div class="player" v-for="(player, pindex) in gameData.players"  :style="{ width: dimensionsBasedOnPlayer }">
+                <div class="player-status" :class="{ locked: player.locked, active: player.active, correct: playerCorrect == pindex}"
                     :style="{ width: dimensionsBasedOnPlayer, height: dimensionsBasedOnPlayer }">
                     <img class="player-status-locked" src="/close.svg" v-if="player.locked">
+                    <img class="player-status-correct" src="/check.svg" v-if="playerCorrect == pindex">
                 </div>
                 <div class="name-and-score-wrapper" v-if="!displayOnly">
                     <input type="text" v-model="player.name">
@@ -53,7 +54,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import * as Socket from "../composeables/socket";
-import { GameData, GameType, HardwareCommand, ValueUpdate } from '../types';
+import { GameData, GameType, HardwareCommand } from '../types';
 import KeyboardControls from "../components/KeyboardControls.vue";
 import ToggleButton from "../components/ToggleButton.vue";
 
@@ -75,6 +76,7 @@ export default defineComponent({
             pointModifier: 1,
             addPointsWhenCorrect: true,
             deductPointsWhenInorrect: true,
+            playerCorrect: -1,
         }
     },
     methods: {
@@ -161,12 +163,15 @@ export default defineComponent({
             if ("command" in hc) {
                 switch (hc.command) {
                     case 'correct':
-                        for (let p of this.gameData.players) {
+                        for (let i = 0; i < this.gameData.players.length; i++) {
+                            const p = this.gameData.players[i];
                             if (p.active == true) {
                                 p.active = false;
                                 if (this.addPointsWhenCorrect) {
                                     p.points += this.pointModifier;
                                 }
+                                this.playerCorrect = i;
+                                setTimeout(()=>{this.playerCorrect = -1}, 2000);
                             }
                         }
                         break;
@@ -287,11 +292,20 @@ code {
     border-color: var(--red);
     background-color: var(--red-light);
 }
+.player-status.correct {
+    border-color: var(--green);
+    background-color: var(--green-light);
+}
 
 .player-status-locked {
     width: 100%;
     height: 100%;
     filter: var(--red-filter)
+}
+.player-status-correct {
+    width: 100%;
+    height: 100%;
+    filter: var(--green-filter)
 }
 
 .name-and-score-wrapper {
