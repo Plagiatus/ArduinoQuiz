@@ -33,8 +33,10 @@
                     <input type="number" v-model="pointModifier" id="point-modifier-input">
                     <span>+</span>
                 </div>
-                <ToggleButton :text="'Add Points When Correct'" :enabled="addPointsWhenCorrect" @click="toggleAddPoints" />
-                <ToggleButton :text="'Deduct Points When Incorrect'" :enabled="deductPointsWhenInorrect" @click="toggleDeductPoints" />
+                <ToggleButton :text="'Add Points When Correct'" :enabled="addPointsWhenCorrect"
+                    @click="toggleAddPoints" />
+                <ToggleButton :text="'Deduct Points When Incorrect'" :enabled="deductPointsWhenInorrect"
+                    @click="toggleDeductPoints" />
             </div>
             <ToggleButton :text="'Fullscreen'" :enabled="inFullscreen" @click="toggleFullscreen" />
             <button @click="newGame">New Game</button>
@@ -51,7 +53,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import * as Socket from "../composeables/socket";
-import { GameData, GameType } from '../types';
+import { GameData, GameType, HardwareCommand, ValueUpdate } from '../types';
 import KeyboardControls from "../components/KeyboardControls.vue";
 import ToggleButton from "../components/ToggleButton.vue";
 
@@ -131,8 +133,11 @@ export default defineComponent({
             console.log({ altKey, ctrlKey, shiftKey, key });
             // event.preventDefault();
         },
-        handleHardwareCommands(data: any) {
+        handleHardwareCommands(data: HardwareCommand) {
             console.log("hardware", data);
+            if (this.isSimple) {
+                this.hardwareHandlingSimple(data);
+            }
         },
         toggleAddPoints() { this.addPointsWhenCorrect = !this.addPointsWhenCorrect },
         toggleDeductPoints() { this.deductPointsWhenInorrect = !this.deductPointsWhenInorrect },
@@ -147,10 +152,49 @@ export default defineComponent({
         },
         switchToNextGametype() {
             this.gameData.type++;
-            if(this.gameData.type > Object.keys(GameType).length / 2){
+            if (this.gameData.type > Object.keys(GameType).length / 2) {
                 this.gameData.type = 1;
             }
         },
+        //#region hardware handling
+        hardwareHandlingSimple(hc: HardwareCommand): void {
+            if ("command" in hc) {
+                switch (hc.command) {
+                    case 'correct':
+                        for (let p of this.gameData.players) {
+                            if (p.active == true) {
+                                p.active = false;
+                                if (this.addPointsWhenCorrect) {
+                                    p.points += this.pointModifier;
+                                }
+                            }
+                        }
+                        break;
+                    case 'wrong':
+                        for (let p of this.gameData.players) {
+                            if (p.active == true) {
+                                p.active = false;
+                                p.locked = true;
+                                if (this.deductPointsWhenInorrect) {
+                                    p.points -= this.pointModifier;
+                                }
+                            }
+                        }
+                        break;
+                    case 'reset':
+                        for (let p of this.gameData.players) {
+                            p.active = false;
+                            p.locked = false;
+                        }
+                        break;
+                }
+            } else {
+                if (this.gameData.players[hc.player]) {
+                    this.gameData.players[hc.player].active = true;
+                }
+            }
+        },
+        //#endregion
     },
     computed: {
         isSimple(): boolean {
@@ -289,7 +333,7 @@ input[type="number"] {
     justify-content: space-around;
 }
 
-#controls-wrapper > div {
+#controls-wrapper>div {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -299,16 +343,19 @@ input[type="number"] {
     user-select: none;
     display: flex;
 }
-#point-modifier-wrapper > input {
+
+#point-modifier-wrapper>input {
     border: none;
     width: 3em;
     flex-grow: 1;
 }
-#point-modifier-wrapper > * {
+
+#point-modifier-wrapper>* {
     padding: 0.6em;
     text-align: center;
 }
-#point-modifier-wrapper > span {
+
+#point-modifier-wrapper>span {
     background-color: var(--bg-color2);
     cursor: pointer;
     border: 1px solid var(--text-color);
