@@ -14,5 +14,6 @@ export interface Player {
 export enum GameType {
     SIMPLE = 1,
     FAMILYFEUD,
+    JEOPARDY
 }
 

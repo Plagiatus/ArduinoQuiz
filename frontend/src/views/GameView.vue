@@ -17,9 +17,26 @@
                 </div>
             </div>
         </div>
+        <div id="ff-wrapper" v-if="isFamilyFeud">
+
+        </div>
+        <div id="jeopardy-wrapper" v-if="isJeopardy">
+
+        </div>
         <div id="controls-wrapper" v-if="!displayOnly">
+            <div id="controls-points">
+                <h3>Points</h3>
+                <ToggleButton :text="'Display Points'" :enabled="pointsVisible" @click="togglePointsVisibility" />
+                <div id="point-modifier-wrapper">
+                    <label for="point-modifier-input">Point Modifier</label>
+                    <span>-</span>
+                    <input type="number" v-model="pointModifier" id="point-modifier-input">
+                    <span>+</span>
+                </div>
+                <ToggleButton :text="'Add Points When Correct'" :enabled="addPointsWhenCorrect" @click="toggleAddPoints" />
+                <ToggleButton :text="'Deduct Points When Incorrect'" :enabled="deductPointsWhenInorrect" @click="toggleDeductPoints" />
+            </div>
             <ToggleButton :text="'Fullscreen'" :enabled="inFullscreen" @click="toggleFullscreen" />
-            <ToggleButton :text="'Show Points'" :enabled="pointsVisible" @click="togglePointsVisibility" />
             <button @click="newGame">New Game</button>
             <button @click="switchToNextGametype">Switch to {{ nextGameType }}</button>
         </div>
@@ -53,6 +70,9 @@ export default defineComponent({
             hasRecievedNewData: false,
             pointsVisible: true,
             inFullscreen: false,
+            pointModifier: 1,
+            addPointsWhenCorrect: true,
+            deductPointsWhenInorrect: true,
         }
     },
     methods: {
@@ -113,6 +133,8 @@ export default defineComponent({
         handleHardwareCommands(data: any) {
             console.log("hardware", data);
         },
+        toggleAddPoints() { this.addPointsWhenCorrect = !this.addPointsWhenCorrect },
+        toggleDeductPoints() { this.deductPointsWhenInorrect = !this.deductPointsWhenInorrect },
         togglePointsVisibility() { this.pointsVisible = !this.pointsVisible },
         toggleFullscreen() {
             this.inFullscreen = !this.inFullscreen
@@ -136,6 +158,9 @@ export default defineComponent({
         isFamilyFeud(): boolean {
             return this.gameData.type === GameType.FAMILYFEUD;
         },
+        isJeopardy(): boolean {
+            return this.gameData.type === GameType.JEOPARDY;
+        },
         dimensionsBasedOnPlayer(): string {
             let amtPlayers = this.gameData.players.length;
             return Math.floor(90 / amtPlayers) + "vw";
@@ -145,6 +170,8 @@ export default defineComponent({
                 case GameType.SIMPLE:
                     return "Family Feud"
                 case GameType.FAMILYFEUD:
+                    return "Jeopardy"
+                case GameType.JEOPARDY:
                     return "Simple"
             }
             return "";
@@ -255,6 +282,37 @@ input[type="number"] {
 }
 
 #controls-wrapper {
+    display: flex;
     flex-grow: 1;
+    align-items: flex-end;
+    justify-content: space-around;
+}
+
+#controls-wrapper > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+#point-modifier-wrapper {
+    user-select: none;
+    display: flex;
+}
+#point-modifier-wrapper > input {
+    border: none;
+    width: 3em;
+    flex-grow: 1;
+}
+#point-modifier-wrapper > * {
+    padding: 0.6em;
+    text-align: center;
+}
+#point-modifier-wrapper > span {
+    background-color: var(--bg-color2);
+    cursor: pointer;
+    border: 1px solid var(--text-color);
+    font-weight: 800;
+    width: 2em;
+    display: inline-block;
 }
 </style>
