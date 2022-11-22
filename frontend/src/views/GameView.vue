@@ -28,20 +28,30 @@
             <div id="controls-points">
                 <h3>Points</h3>
                 <ToggleButton :text="'Display Points'" :enabled="pointsVisible" @click="togglePointsVisibility" />
-                <div id="point-modifier-wrapper">
+                <div id="numeric-modifier-wrapper">
                     <label for="point-modifier-input">Point Modifier</label>
-                    <span>-</span>
+                    <span @click="modifyPointModifier(-1)">-</span>
                     <input type="number" v-model="pointModifier" id="point-modifier-input">
-                    <span>+</span>
+                    <span @click="modifyPointModifier(1)">+</span>
                 </div>
                 <ToggleButton :text="'Add Points When Correct'" :enabled="addPointsWhenCorrect"
-                    @click="toggleAddPoints" />
+                @click="toggleAddPoints" />
                 <ToggleButton :text="'Deduct Points When Incorrect'" :enabled="deductPointsWhenInorrect"
-                    @click="toggleDeductPoints" />
+                @click="toggleDeductPoints" />
+            </div>
+            <div>
+                <div id="numeric-modifier-wrapper">
+                    <label for="correct-display-input">Correct Display Duration</label>
+                    <span @click="modifyCorrectDisplayDuration(-1)">-</span>
+                    <input type="number" v-model="correctDisplayDuration" id="correct-display-input" min="0">
+                    <span @click="modifyCorrectDisplayDuration(1)">+</span>
+                </div>
             </div>
             <ToggleButton :text="'Fullscreen'" :enabled="inFullscreen" @click="toggleFullscreen" />
-            <button @click="newGame">New Game</button>
-            <button @click="switchToNextGametype">Switch to {{ nextGameType }}</button>
+            <div>
+                <button @click="newGame">New Game</button>
+                <button @click="switchToNextGametype">Switch to {{ nextGameType }}</button>
+            </div>
         </div>
         <!-- <KeyboardControls v-if="controlView || showKeyboardControls" /> -->
         <button id="fullscreen-btn">
@@ -68,12 +78,14 @@ export default defineComponent({
     data() {
         return {
             initTimeout: NaN,
+            correctDisplayTimeout: NaN,
             gameData: {} as GameData,
             showKeyboardControls: false,
             hasRecievedNewData: false,
             pointsVisible: true,
             inFullscreen: false,
             pointModifier: 1,
+            correctDisplayDuration: 3,
             addPointsWhenCorrect: true,
             deductPointsWhenInorrect: true,
             playerCorrect: -1,
@@ -158,6 +170,10 @@ export default defineComponent({
                 this.gameData.type = 1;
             }
         },
+        modifyPointModifier(amt: number){this.pointModifier += amt;},
+        modifyCorrectDisplayDuration(amt: number){this.correctDisplayDuration += amt;},
+        // TODO: save & propagate settings
+
         //#region hardware handling
         hardwareHandlingSimple(hc: HardwareCommand): void {
             if ("command" in hc) {
@@ -171,7 +187,8 @@ export default defineComponent({
                                     p.points += this.pointModifier;
                                 }
                                 this.playerCorrect = i;
-                                setTimeout(()=>{this.playerCorrect = -1}, 2000);
+                                if(this.correctDisplayTimeout) clearTimeout(this.correctDisplayTimeout);
+                                this.correctDisplayTimeout = setTimeout(()=>{this.playerCorrect = -1}, this.correctDisplayDuration * 1000);
                             }
                         }
                         break;
@@ -191,6 +208,9 @@ export default defineComponent({
                             p.active = false;
                             p.locked = false;
                         }
+                        this.playerCorrect = -1;
+                        if(this.correctDisplayTimeout) clearTimeout(this.correctDisplayTimeout);
+                        this.correctDisplayTimeout = NaN;
                         break;
                 }
             } else {
@@ -230,7 +250,7 @@ export default defineComponent({
     watch: {
         gameData: {
             handler(newData, oldData) {
-                if (!this.hasRecievedNewData) Socket.socketSendMessage("newData", newData);
+                if (!this.hasRecievedNewData && !this.displayOnly) Socket.socketSendMessage("newData", newData);
                 this.hasRecievedNewData = false;
             },
             deep: true,
@@ -353,23 +373,23 @@ input[type="number"] {
     gap: 2px;
 }
 
-#point-modifier-wrapper {
+#numeric-modifier-wrapper {
     user-select: none;
     display: flex;
 }
 
-#point-modifier-wrapper>input {
+#numeric-modifier-wrapper>input {
     border: none;
     width: 3em;
     flex-grow: 1;
 }
 
-#point-modifier-wrapper>* {
+#numeric-modifier-wrapper>* {
     padding: 0.6em;
     text-align: center;
 }
 
-#point-modifier-wrapper>span {
+#numeric-modifier-wrapper>span {
     background-color: var(--bg-color2);
     cursor: pointer;
     border: 1px solid var(--text-color);
