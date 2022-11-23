@@ -2,7 +2,16 @@ export interface GameData {
     timeout: number,
     players: Player[],
     type: GameType,
-    data: undefined | FamilyFeudData,
+}
+
+export interface QuestionDataCurrent {
+    familyFeud: undefined | FamilyFeudData,
+    jeopardy: undefined | JeopardyData,
+}
+
+export interface QuestionDataFull {
+    familyFeud: undefined | FamilyFeudFullGameData,
+    jeopardy: undefined | JeopardyFullGameData,
 }
 
 export interface Player {
@@ -19,7 +28,6 @@ export enum GameType {
 }
 
 export interface FamilyFeudData {
-    type: "ff",
     currentQuestion: FamilyFeudQuestion,
     visibleAnswers: number[],
 }
@@ -38,7 +46,9 @@ interface FamilyFeudAnswer {
 }
 
 export interface JeopardyData {
-    type: "jeopardy",
+}
+
+export interface JeopardyFullGameData {
 }
 
 export type HardwareCommand = HardwareButtonCommand | HardwarePlayerCommand;
@@ -49,3 +59,12 @@ interface HardwareButtonCommand {
 interface HardwarePlayerCommand {
     player: number,
 }
+
+export interface Settings {
+    pointModifier: number,
+    correctDisplayDuration: number,
+
+    pointsVisible: boolean,
+    addPointsWhenCorrect: boolean,
+    deductPointsWhenInorrect: boolean,
+} 

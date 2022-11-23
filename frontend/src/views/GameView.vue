@@ -10,11 +10,11 @@
                 </div>
                 <div class="name-and-score-wrapper" v-if="!displayOnly">
                     <input type="text" v-model="player.name">
-                    <input type="number" v-model="player.points" v-if="pointsVisible">
+                    <input type="number" v-model="player.points" v-if="settings.pointsVisible">
                 </div>
                 <div class="name-and-score-wrapper" v-else>
                     <span>{{ player.name }}</span>
-                    <span v-if="pointsVisible">{{ player.points }}</span>
+                    <span v-if="settings.pointsVisible">{{ player.points }}</span>
                 </div>
             </div>
         </div>
@@ -27,23 +27,23 @@
         <div id="controls-wrapper" v-if="!displayOnly">
             <div id="controls-points">
                 <h3>Points</h3>
-                <ToggleButton :text="'Display Points'" :enabled="pointsVisible" @click="togglePointsVisibility" />
+                <ToggleButton :text="'Display Points'" :enabled="settings.pointsVisible" @click="togglePointsVisibility" />
                 <div id="numeric-modifier-wrapper">
                     <label for="point-modifier-input">Point Modifier</label>
                     <span @click="modifyPointModifier(-1)">-</span>
-                    <input type="number" v-model="pointModifier" id="point-modifier-input">
+                    <input type="number" v-model="settings.pointModifier" id="point-modifier-input">
                     <span @click="modifyPointModifier(1)">+</span>
                 </div>
-                <ToggleButton :text="'Add Points When Correct'" :enabled="addPointsWhenCorrect"
+                <ToggleButton :text="'Add Points When Correct'" :enabled="settings.addPointsWhenCorrect"
                 @click="toggleAddPoints" />
-                <ToggleButton :text="'Deduct Points When Incorrect'" :enabled="deductPointsWhenInorrect"
+                <ToggleButton :text="'Deduct Points When Incorrect'" :enabled="settings.deductPointsWhenInorrect"
                 @click="toggleDeductPoints" />
             </div>
             <div>
                 <div id="numeric-modifier-wrapper">
                     <label for="correct-display-input">Correct Display Duration</label>
                     <span @click="modifyCorrectDisplayDuration(-1)">-</span>
-                    <input type="number" v-model="correctDisplayDuration" id="correct-display-input" min="0">
+                    <input type="number" v-model="settings.correctDisplayDuration" id="correct-display-input" min="0">
                     <span @click="modifyCorrectDisplayDuration(1)">+</span>
                 </div>
             </div>
@@ -64,7 +64,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import * as Socket from "../composeables/socket";
-import { GameData, GameType, HardwareCommand } from '../types';
+import { GameData, GameType, HardwareCommand, Settings } from '../types';
 import KeyboardControls from "../components/KeyboardControls.vue";
 import ToggleButton from "../components/ToggleButton.vue";
 
@@ -77,17 +77,23 @@ export default defineComponent({
     },
     data() {
         return {
+            gameData: {} as GameData,
+
             initTimeout: NaN,
             correctDisplayTimeout: NaN,
-            gameData: {} as GameData,
-            showKeyboardControls: false,
-            hasRecievedNewData: false,
-            pointsVisible: true,
+
+            settings: {
+                pointsVisible: true,
+                pointModifier: 1,
+                correctDisplayDuration: 3,
+                addPointsWhenCorrect: true,
+                deductPointsWhenInorrect: true,
+            } as Settings,
+            
             inFullscreen: false,
-            pointModifier: 1,
-            correctDisplayDuration: 3,
-            addPointsWhenCorrect: true,
-            deductPointsWhenInorrect: true,
+            hasRecievedNewGameData: false,
+            hasRecievedNewSettings: false,
+            showKeyboardControls: false,
             playerCorrect: -1,
         }
     },
@@ -118,7 +124,6 @@ export default defineComponent({
                 //@ts-ignore
                 type: GameType[GameType[gameType]],
                 players: [],
-                data: undefined,
             }
             for (let i: number = 0; i < playerAmount; i++) {
                 this.gameData.players.push({ active: false, locked: false, points: 0, name: "" });
@@ -127,14 +132,19 @@ export default defineComponent({
         },
         recieveNewData(newData: GameData) {
             clearTimeout(this.initTimeout);
-            this.hasRecievedNewData = true;
+            this.hasRecievedNewGameData = true;
             this.gameData = newData;
+        },
+        recieveNewSettings(newSettings: Settings) {
+            this.hasRecievedNewSettings = true;
+            this.settings = newSettings;
         },
         handleSocketRequest(requestType: string) {
             switch (requestType) {
                 case "gameData":
                     if (Object.keys(this.gameData).length > 0) {
-                        Socket.socketSendMessage("newData", this.gameData)
+                        Socket.socketSendMessage("newData", this.gameData);
+                        Socket.socketSendMessage("newSettings", this.settings);
                     }
                     break;
 
@@ -153,9 +163,9 @@ export default defineComponent({
                 this.hardwareHandlingSimple(data);
             }
         },
-        toggleAddPoints() { this.addPointsWhenCorrect = !this.addPointsWhenCorrect },
-        toggleDeductPoints() { this.deductPointsWhenInorrect = !this.deductPointsWhenInorrect },
-        togglePointsVisibility() { this.pointsVisible = !this.pointsVisible },
+        toggleAddPoints() { this.settings.addPointsWhenCorrect = !this.settings.addPointsWhenCorrect },
+        toggleDeductPoints() { this.settings.deductPointsWhenInorrect = !this.settings.deductPointsWhenInorrect },
+        togglePointsVisibility() { this.settings.pointsVisible = !this.settings.pointsVisible },
         toggleFullscreen() {
             this.inFullscreen = !this.inFullscreen
             if (this.inFullscreen) {
@@ -170,8 +180,8 @@ export default defineComponent({
                 this.gameData.type = 1;
             }
         },
-        modifyPointModifier(amt: number){this.pointModifier += amt;},
-        modifyCorrectDisplayDuration(amt: number){this.correctDisplayDuration += amt;},
+        modifyPointModifier(amt: number){this.settings.pointModifier += amt;},
+        modifyCorrectDisplayDuration(amt: number){this.settings.correctDisplayDuration += amt;},
         // TODO: save & propagate settings
 
         //#region hardware handling
@@ -183,12 +193,12 @@ export default defineComponent({
                             const p = this.gameData.players[i];
                             if (p.active == true) {
                                 p.active = false;
-                                if (this.addPointsWhenCorrect) {
-                                    p.points += this.pointModifier;
+                                if (this.settings.addPointsWhenCorrect) {
+                                    p.points += this.settings.pointModifier;
                                 }
                                 this.playerCorrect = i;
                                 if(this.correctDisplayTimeout) clearTimeout(this.correctDisplayTimeout);
-                                this.correctDisplayTimeout = setTimeout(()=>{this.playerCorrect = -1}, this.correctDisplayDuration * 1000);
+                                this.correctDisplayTimeout = setTimeout(()=>{this.playerCorrect = -1}, this.settings.correctDisplayDuration * 1000);
                             }
                         }
                         break;
@@ -197,8 +207,8 @@ export default defineComponent({
                             if (p.active == true) {
                                 p.active = false;
                                 p.locked = true;
-                                if (this.deductPointsWhenInorrect) {
-                                    p.points -= this.pointModifier;
+                                if (this.settings.deductPointsWhenInorrect) {
+                                    p.points -= this.settings.pointModifier;
                                 }
                             }
                         }
@@ -250,14 +260,22 @@ export default defineComponent({
     watch: {
         gameData: {
             handler(newData, oldData) {
-                if (!this.hasRecievedNewData && !this.displayOnly) Socket.socketSendMessage("newData", newData);
-                this.hasRecievedNewData = false;
+                if (!this.hasRecievedNewGameData && !this.displayOnly) Socket.socketSendMessage("newData", newData);
+                this.hasRecievedNewGameData = false;
+            },
+            deep: true,
+        },
+        settings: {
+            handler(newData, oldData){
+                if (!this.hasRecievedNewSettings && !this.displayOnly) Socket.socketSendMessage("newSettings", newData);
+                this.hasRecievedNewSettings = false;
             },
             deep: true,
         }
     },
     mounted() {
         Socket.socketListen("newData", this.recieveNewData);
+        Socket.socketListen("newSettings", this.recieveNewSettings);
         Socket.socketListen("request", this.handleSocketRequest);
         Socket.socketListen("hardware", this.handleHardwareCommands);
         this.initGameData();
