@@ -1,0 +1,104 @@
+{
+    "__source": "https://www.reddit.com/r/de/comments/bqvjk1/wir_haben_285_rdeler_gefragt_auswerung_vom/",
+    "questions": [
+        {
+            "question": "Nenne einen bekannten, blonden Mann",
+            "answers": [
+                {"answer": "Thomas Gottschalk", "value": 28},
+                {"answer": "Donald Trump", "value": 8},
+                {"answer": "Dieter Bohlen", "value": 7},
+                {"answer": "Boris Becker", "value": 6},
+                {"answer": "Chris Hemsworth", "value": 5},
+                {"answer": "Christian Lindner", "value": 4}
+            ]
+        },
+        {
+            "question": "Nenne einen Preis, der jedes Jahr vergeben wird",
+            "answers": [
+                {"answer": "Oscar", "value": 55},
+                {"answer": "Nobelpreis", "value": 21},
+                {"answer": "Bambi", "value": 4},
+                {"answer": "Grammy", "value": 3},
+                {"answer": "Grimme-Preis", "value": 2},
+                {"answer": "Echo", "value": 2}
+            ]
+        },
+        {
+            "question": "Nenne einen ausländischen Fußballverein",
+            "answers": [
+                {"answer": "Real Madrid", "value": 21},
+                {"answer": "FC Barcelona", "value": 17},
+                {"answer": "Manchester United", "value": 15},
+                {"answer": "FC Liverpool", "value": 12},
+                {"answer": "FC Arsenal", "value": 6},
+                {"answer": "FC Chelsea", "value": 4}
+            ]
+        },
+        {
+            "question": "Nenne ein Lieblingsschulfach",
+            "answers": [
+                {"answer": "Mathematik", "value": 32},
+                {"answer": "Sport", "value": 22},
+                {"answer": "Englisch", "value": 10},
+                {"answer": "Geschichte", "value": 9},
+                {"answer": "Physik", "value": 5},
+                {"answer": "Biologie", "value": 5}
+            ]
+        },
+        {
+            "question": "Nenne einen Traumberuf vieler Kinder",
+            "answers": [
+                {"answer": "Feuerwehmann", "value": 34},
+                {"answer": "Astronaut", "value": 22},
+                {"answer": "Polizist", "value": 17},
+                {"answer": "Pilot", "value": 8},
+                {"answer": "Arzt", "value": 5},
+                {"answer": "Tierarzt", "value": 4}
+            ]
+        },
+        {
+            "question": "Nenne eine beliebte Eissorte",
+            "answers": [
+                {"answer": "Vanille", "value": 38},
+                {"answer": "Schokolade", "value": 26},
+                {"answer": "Erdbeere", "value": 15},
+                {"answer": "Stracciatella", "value": 7},
+                {"answer": "Zitrone", "value": 5},
+                {"answer": "Schlumpf", "value": 2}
+            ]
+        },
+        {
+            "question": "Nenne ein Lieblingstier, welches kein Haustier ist",
+            "answers": [
+                {"answer": "Elefant", "value": 16},
+                {"answer": "Löwe", "value": 13},
+                {"answer": "Pferd", "value": 9},
+                {"answer": "Tiger", "value": 7},
+                {"answer": "Delfin", "value": 6},
+                {"answer": "Pinguin", "value": 5}
+            ]
+        },
+        {
+            "question": "Nenne eine Sportart, in der man etwas fängt",
+            "answers": [
+                {"answer": "Handball", "value": 33},
+                {"answer": "Baseball", "value": 23},
+                {"answer": "Basketball", "value": 15},
+                {"answer": "American Football", "value": 11},
+                {"answer": "Ultimate Frisbee", "value": 4},
+                {"answer": "Fangen", "value": 4}
+            ]
+        },
+        {
+            "question": "Nenne eine Hauptstadt Europas, außer Berlin",
+            "answers": [
+                {"answer": "Paris", "value": 40},
+                {"answer": "London", "value": 14},
+                {"answer": "Rom", "value": 8},
+                {"answer": "Wien", "value": 7},
+                {"answer": "Madrid", "value": 6},
+                {"answer": "Prag", "value": 5}
+            ]
+        }
+    ]
+}
