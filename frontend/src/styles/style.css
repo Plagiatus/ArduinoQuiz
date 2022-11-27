@@ -26,6 +26,7 @@
   --red-light: rgba(221, 46, 68, 0.4);
   --green: #4bdd2e;
   --green-light: rgba(75, 221, 46, 0.4);
+  --active: aquamarine;
   
   --text-color-filter: brightness(0) saturate(100%) invert(94%) sepia(100%) saturate(0%) hue-rotate(169deg) brightness(104%) contrast(109%);
   --red-filter: brightness(0) saturate(100%) invert(21%) sepia(88%) saturate(2183%) hue-rotate(337deg) brightness(108%) contrast(84%);

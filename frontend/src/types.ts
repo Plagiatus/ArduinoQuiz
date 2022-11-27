@@ -30,6 +30,8 @@ export enum GameType {
 export interface FamilyFeudData {
     currentQuestion: FamilyFeudQuestion,
     visibleAnswers: number[],
+    questionVisible: boolean,
+    mistakes: [number, number],
 }
 
 export interface FamilyFeudFullGameData {
@@ -64,6 +66,7 @@ export interface Settings {
     pointModifier: number,
     correctDisplayDuration: number,
 
+    namesVisible: boolean,
     pointsVisible: boolean,
     addPointsWhenCorrect: boolean,
     deductPointsWhenInorrect: boolean,
