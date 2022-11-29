@@ -34,7 +34,8 @@
             </div>
             <div id="ff-game-wrapper" v-else>
                 <div id="ff-game-and-controls">
-                    <div class="ff-navigation" v-if="!displayOnly"><img src="/navigate_before.svg" alt="previous"></div>
+                    <div class="ff-navigation" v-if="!displayOnly" @click="switchToFFQuestion(-1)"><img
+                            src="/navigate_before.svg" alt="previous"></div>
                     <div id="ff-game">
                         <div id="ff-question" :class="{ textHidden: !activeQuestionData.familyFeud?.questionVisible }"
                             @click="toggleFFQuestion">
@@ -98,12 +99,13 @@
 
                         </div>
                     </div>
-                    <div class="ff-navigation" v-if="!displayOnly"><img src="/navigate_next.svg" alt="next"></div>
+                    <div class="ff-navigation" v-if="!displayOnly" @click="switchToFFQuestion(1)"><img
+                            src="/navigate_next.svg" alt="next"></div>
                 </div>
             </div>
-        </div>
-        <div id="jeopardy-wrapper" v-if="isJeopardy">
-            Jeopardy is not ready yet.
+            <div id="jeopardy-wrapper" v-if="isJeopardy">
+                Jeopardy is not ready yet.
+            </div>
         </div>
         <div id="controls-wrapper" v-if="!displayOnly">
             <div id="controls-points">
@@ -192,6 +194,8 @@ export default defineComponent({
             showKeyboardControls: false,
             playerCorrect: -1,
             lastActivePlayer: -1,
+            roundProgress: 0,
+            gameProgress: 0,
 
             hasRecievedNewGameData: false,
             hasRecievedNewActiveQuestion: false,
@@ -271,6 +275,8 @@ export default defineComponent({
             console.log("hardware", data);
             if (this.isSimple) {
                 this.hardwareHandlingSimple(data);
+            } else if (this.isFamilyFeud) {
+                this.hardwareHandlingFF(data);
             }
         },
         //#region settings
@@ -291,6 +297,8 @@ export default defineComponent({
             if (this.generalGameData.type > Object.keys(GameType).length / 2) {
                 this.generalGameData.type = 1;
             }
+            this.lastActivePlayer = -1;
+            this.roundProgress = 0;
         },
         modifyPointModifier(amt: number) { this.settings.pointModifier += amt; },
         modifyCorrectDisplayDuration(amt: number) { this.settings.correctDisplayDuration += amt; },
@@ -345,6 +353,44 @@ export default defineComponent({
                 }
             }
         },
+
+        hardwareHandlingFF(hc: HardwareCommand): void {
+            if (!this.activeQuestionData.familyFeud) return;
+            if (this.roundProgress >= 5) return;
+            if ("command" in hc) {
+                this.generalGameData.players[0].active = false;
+                this.generalGameData.players[1].active = false;
+
+                switch (hc.command) {
+                    case 'correct':
+                        break;
+                    case 'wrong':
+                        this.activeQuestionData.familyFeud.mistakes[this.lastActivePlayer]++; // count up the active teams mistakes
+                        if (this.roundProgress === 1) {    // a team buzzed but answered wrong
+                            this.roundProgress = 2;
+                            this.lastActivePlayer = (this.lastActivePlayer + 1) % 2; // make the other team active
+                        } else if (this.roundProgress === 2) { // the second team has a chance to a better answer but answers wrong
+                            this.roundProgress = 3;
+                            this.lastActivePlayer = (this.lastActivePlayer + 1) % 2; // make the other team active
+                        } else if (this.roundProgress === 3 && this.activeQuestionData.familyFeud.mistakes[this.lastActivePlayer] >= 3) { // answering team made 3 mistakes
+                            this.roundProgress = 4;
+                            this.lastActivePlayer = (this.lastActivePlayer + 1) % 2; // make the other team active
+                        } else if (this.roundProgress === 4) {// enemy team couldn't steal it
+                            this.lastActivePlayer = (this.lastActivePlayer + 1) % 2; // make the other team active
+                            this.addPointsToActiveTeam();
+                        }
+                        break;
+                    case 'reset':
+                        break;
+                }
+            } else {
+                if (hc.player >= 2) return;
+                if (this.roundProgress != 0) return; // question was just revealed, set player active
+                this.roundProgress = 1;
+                this.generalGameData.players[hc.player].active = true;
+                this.lastActivePlayer = hc.player;
+            }
+        },
         //#endregion
 
         //#region load question data
@@ -386,11 +432,59 @@ export default defineComponent({
         toggleFFAnswer(index: number) {
             if (this.activeQuestionData.familyFeud && this.activeQuestionData.familyFeud.visibleAnswers && !this.displayOnly) {
                 let found = this.activeQuestionData.familyFeud.visibleAnswers.indexOf(index);
-                if (found === -1)
+                if (found === -1) {
+                    this.hardwareHandlingFF({ command: "correct" });
+                    if (this.roundProgress === 1) {
+                        this.roundProgress++;
+                        // is this answer the highest? if not, switch teams
+                        if (index > 0)
+                            this.lastActivePlayer = (this.lastActivePlayer + 1) % 2; // make the other team active
+                        else this.roundProgress = 3;
+                    } else if (this.roundProgress === 2) {
+                        this.roundProgress++;
+                        // check if this answer was higher than the previous one, if not, switch teams
+                        if (this.activeQuestionData.familyFeud.visibleAnswers[0] < index)
+                            this.lastActivePlayer = (this.lastActivePlayer + 1) % 2; // make the other team active
+                    } else if (this.roundProgress === 4 && this.activeQuestionData.familyFeud.visibleAnswers.length - 1 != this.activeQuestionData.familyFeud.currentQuestion.answers.length) {
+                        // other team managed to steal it
+                        this.addPointsToActiveTeam();
+                    }
+
                     this.activeQuestionData.familyFeud.visibleAnswers.push(index);
+                    //check if all answers were shown7
+                    console.log(this.activeQuestionData.familyFeud.visibleAnswers.length, this.activeQuestionData.familyFeud.currentQuestion.answers.length)
+                    if (this.activeQuestionData.familyFeud.visibleAnswers.length === this.activeQuestionData.familyFeud.currentQuestion.answers.length) {
+                        this.addPointsToActiveTeam();
+                    }
+                }
                 else
                     this.activeQuestionData.familyFeud.visibleAnswers.splice(found, 1);
             }
+        },
+        switchToFFQuestion(modifier: number) {
+            if (!this.questionData.familyFeud || !this.activeQuestionData.familyFeud) return;
+            this.gameProgress = Math.min(Math.max(this.gameProgress + modifier, 0), this.questionData.familyFeud.questions.length ?? 0);
+            this.roundProgress = 0;
+            this.lastActivePlayer = -1;
+            this.activeQuestionData.familyFeud.currentQuestion = this.questionData.familyFeud.questions[this.gameProgress];
+            this.activeQuestionData.familyFeud.mistakes = [0, 0];
+            this.activeQuestionData.familyFeud.questionVisible = false;
+            this.activeQuestionData.familyFeud.visibleAnswers = [];
+        },
+        addPointsToActiveTeam() {
+            if(!this.activeQuestionData.familyFeud) return;
+            if(this.roundProgress >= 5) return;
+
+            this.roundProgress = 5;
+            let total: number = 0;
+            total = this.activeQuestionData.familyFeud.currentQuestion.answers.reduce(
+                (accumulator, answer, currentIndex) => {
+                    if (this.activeQuestionData.familyFeud?.visibleAnswers.includes(currentIndex)) { 
+                        accumulator += answer.value;
+                    }
+                    return accumulator;
+                }, 0);
+            this.generalGameData.players[this.lastActivePlayer].points += total;
         },
         //#endregion
     },
