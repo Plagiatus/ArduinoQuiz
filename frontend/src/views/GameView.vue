@@ -5,10 +5,10 @@
             <div class="player" v-for="(player, pindex) in generalGameData.players"
                 :style="{ width: dimensionsBasedOnPlayer }">
                 <div class="player-status"
-                    :class="{ locked: player.locked, active: player.active, correct: playerCorrect == pindex }"
+                    :class="{ locked: player.locked, active: player.active, correct: playerCorrect == pindex && !player.locked }"
                     :style="{ width: dimensionsBasedOnPlayer, height: dimensionsBasedOnPlayer }">
                     <img class="player-status-locked" src="/close.svg" v-if="player.locked">
-                    <img class="player-status-correct" src="/check.svg" v-if="playerCorrect == pindex">
+                    <img class="player-status-correct" src="/check.svg" v-else-if="playerCorrect == pindex">
                 </div>
                 <div class="name-and-score-wrapper" v-if="!displayOnly">
                     <input size="1" class="edit-display" type="text" v-model="player.name" v-if="settings.namesVisible">
@@ -191,6 +191,7 @@ export default defineComponent({
             inFullscreen: false,
             showKeyboardControls: false,
             playerCorrect: -1,
+            lastActivePlayer: -1,
 
             hasRecievedNewGameData: false,
             hasRecievedNewActiveQuestion: false,
@@ -302,8 +303,9 @@ export default defineComponent({
                     case 'correct':
                         for (let i = 0; i < this.generalGameData.players.length; i++) {
                             const p = this.generalGameData.players[i];
-                            if (p.active == true) {
+                            if (p.active == true || this.lastActivePlayer === i) {
                                 p.active = false;
+                                p.locked = false;
                                 if (this.settings.addPointsWhenCorrect) {
                                     p.points += this.settings.pointModifier;
                                 }
@@ -314,8 +316,9 @@ export default defineComponent({
                         }
                         break;
                     case 'wrong':
-                        for (let p of this.generalGameData.players) {
-                            if (p.active == true) {
+                        for (let i = 0; i < this.generalGameData.players.length; i++) {
+                            const p = this.generalGameData.players[i];
+                            if (p.active == true || this.lastActivePlayer === i) {
                                 p.active = false;
                                 p.locked = true;
                                 if (this.settings.deductPointsWhenInorrect) {
@@ -330,6 +333,7 @@ export default defineComponent({
                             p.locked = false;
                         }
                         this.playerCorrect = -1;
+                        this.lastActivePlayer = -1;
                         if (this.correctDisplayTimeout) clearTimeout(this.correctDisplayTimeout);
                         this.correctDisplayTimeout = NaN;
                         break;
@@ -337,6 +341,7 @@ export default defineComponent({
             } else {
                 if (this.generalGameData.players[hc.player]) {
                     this.generalGameData.players[hc.player].active = true;
+                    this.lastActivePlayer = hc.player;
                 }
             }
         },
