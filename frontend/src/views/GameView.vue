@@ -17,7 +17,7 @@
                 </div>
                 <div class="name-and-score-wrapper" v-else>
                     <span class="edit-display" v-if="settings.namesVisible">{{ player.name }}</span>
-                    <span class="edit-display" v-if="settings.pointsVisible">{{ player.points }}</span>
+                    <SmoothNumberDisplay class="ff-player-points" v-if="settings.pointsVisible" :value="player.points" />
                 </div>
             </div>
         </div>
@@ -62,8 +62,7 @@
                                         :class="{ active: activeQuestionData.familyFeud && activeQuestionData.familyFeud.mistakes[0] >= 3 }">
                                 </div>
                                 <div class="ff-player-info" v-if="displayOnly">
-                                    <span class="ff-player-points" v-if="settings.pointsVisible">
-                                        {{ generalGameData.players[0].points }}</span>
+                                    <SmoothNumberDisplay class="ff-player-points" v-if="settings.pointsVisible" :value="generalGameData.players[0].points" />
                                     <span class="ff-player-name" v-if="settings.namesVisible">
                                         {{ generalGameData.players[0].name }}</span>
                                 </div>
@@ -76,8 +75,7 @@
                             </div>
                             <div class="ff-one-player">
                                 <div class="ff-player-info" v-if="displayOnly">
-                                    <span class="ff-player-points" v-if="settings.pointsVisible">
-                                        {{ generalGameData.players[1].points }}</span>
+                                    <SmoothNumberDisplay class="ff-player-points" v-if="settings.pointsVisible" :value="generalGameData.players[1].points" />
                                     <span class="ff-player-name" v-if="settings.namesVisible">
                                         {{ generalGameData.players[1].name }}</span>
                                 </div>
@@ -163,10 +161,11 @@ import * as Socket from "../composeables/socket";
 import { GameData, GameType, HardwareCommand, Settings, QuestionDataCurrent, QuestionDataFull } from '../types';
 import KeyboardControls from "../components/KeyboardControls.vue";
 import ToggleButton from "../components/ToggleButton.vue";
+import SmoothNumberDisplay from "../components/SmoothNumberDisplay.vue";
 
 
 export default defineComponent({
-    components: { KeyboardControls, ToggleButton },
+    components: { KeyboardControls, ToggleButton, SmoothNumberDisplay },
     props: {
         displayOnly: Boolean,
         controlView: Boolean,
