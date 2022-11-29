@@ -17,7 +17,8 @@
                 </div>
                 <div class="name-and-score-wrapper" v-else>
                     <span class="edit-display" v-if="settings.namesVisible">{{ player.name }}</span>
-                    <SmoothNumberDisplay class="ff-player-points" v-if="settings.pointsVisible" :value="player.points" />
+                    <SmoothNumberDisplay class="ff-player-points" v-if="settings.pointsVisible"
+                        :value="player.points" />
                 </div>
             </div>
         </div>
@@ -34,8 +35,9 @@
             </div>
             <div id="ff-game-wrapper" v-else>
                 <div id="ff-game-and-controls">
-                    <div class="ff-navigation" v-if="!displayOnly" @click="switchToFFQuestion(-1)"><img
-                            src="/navigate_before.svg" alt="previous"></div>
+                    <div class="ff-navigation" v-if="!displayOnly" @click="switchToFFQuestion(-1)" :disabled="gameProgress === 0">
+                        <img src="/navigate_before.svg" alt="previous">
+                    </div>
                     <div id="ff-game">
                         <div id="ff-question" :class="{ textHidden: !activeQuestionData.familyFeud?.questionVisible }"
                             @click="toggleFFQuestion">
@@ -62,7 +64,8 @@
                                         :class="{ active: activeQuestionData.familyFeud && activeQuestionData.familyFeud.mistakes[0] >= 3 }">
                                 </div>
                                 <div class="ff-player-info" v-if="displayOnly">
-                                    <SmoothNumberDisplay class="ff-player-points" v-if="settings.pointsVisible" :value="generalGameData.players[0].points" />
+                                    <SmoothNumberDisplay class="ff-player-points" v-if="settings.pointsVisible"
+                                        :value="generalGameData.players[0].points" />
                                     <span class="ff-player-name" v-if="settings.namesVisible">
                                         {{ generalGameData.players[0].name }}</span>
                                 </div>
@@ -75,7 +78,8 @@
                             </div>
                             <div class="ff-one-player">
                                 <div class="ff-player-info" v-if="displayOnly">
-                                    <SmoothNumberDisplay class="ff-player-points" v-if="settings.pointsVisible" :value="generalGameData.players[1].points" />
+                                    <SmoothNumberDisplay class="ff-player-points" v-if="settings.pointsVisible"
+                                        :value="generalGameData.players[1].points" />
                                     <span class="ff-player-name" v-if="settings.namesVisible">
                                         {{ generalGameData.players[1].name }}</span>
                                 </div>
@@ -97,8 +101,9 @@
 
                         </div>
                     </div>
-                    <div class="ff-navigation" v-if="!displayOnly" @click="switchToFFQuestion(1)"><img
-                            src="/navigate_next.svg" alt="next"></div>
+                    <div class="ff-navigation" v-if="!displayOnly" @click="switchToFFQuestion(1)" :disabled="gameProgress === questionData.familyFeud.questions.length - 1">
+                        <img src="/navigate_next.svg" alt="next">
+                    </div>
                 </div>
             </div>
             <div id="jeopardy-wrapper" v-if="isJeopardy">
@@ -462,7 +467,7 @@ export default defineComponent({
         },
         switchToFFQuestion(modifier: number) {
             if (!this.questionData.familyFeud || !this.activeQuestionData.familyFeud) return;
-            this.gameProgress = Math.min(Math.max(this.gameProgress + modifier, 0), this.questionData.familyFeud.questions.length ?? 0);
+            this.gameProgress = Math.min(Math.max(this.gameProgress + modifier, 0), this.questionData.familyFeud.questions.length - 1 ?? 0);
             this.roundProgress = 0;
             this.lastActivePlayer = -1;
             this.activeQuestionData.familyFeud.currentQuestion = this.questionData.familyFeud.questions[this.gameProgress];
@@ -471,14 +476,14 @@ export default defineComponent({
             this.activeQuestionData.familyFeud.visibleAnswers = [];
         },
         addPointsToActiveTeam() {
-            if(!this.activeQuestionData.familyFeud) return;
-            if(this.roundProgress >= 5) return;
+            if (!this.activeQuestionData.familyFeud) return;
+            if (this.roundProgress >= 5) return;
 
             this.roundProgress = 5;
             let total: number = 0;
             total = this.activeQuestionData.familyFeud.currentQuestion.answers.reduce(
                 (accumulator, answer, currentIndex) => {
-                    if (this.activeQuestionData.familyFeud?.visibleAnswers.includes(currentIndex)) { 
+                    if (this.activeQuestionData.familyFeud?.visibleAnswers.includes(currentIndex)) {
                         accumulator += answer.value;
                     }
                     return accumulator;
@@ -706,21 +711,23 @@ input[type="number"] {
     user-select: none;
 }
 
-.ff-navigation:hover {
+.ff-navigation:hover:not([disabled = "true"]) {
     background-color: var(--bg-color2);
+    cursor: pointer;
 }
 
 .ff-navigation {
-    cursor: pointer;
     display: flex;
     align-items: center;
     margin: 0 1em;
 }
-
 .ff-navigation>img {
     filter: var(--text-color-filter);
     width: 3em;
     height: 3em;
+}
+.ff-navigation[disabled="true"]>img {
+    opacity: 0.2;
 }
 
 .textHidden {
