@@ -54,18 +54,20 @@ export default defineComponent({
                 this.players[i].enabled = true;
                 this.players[i].lockedOut = false;
             }
+            this.activePlayer = -1;
         },
         correct(){
-            if(this.status != 1) return;
+            // if(this.status != 1) return;
             this.clickButtonCommand("correct");
             this.status = 0;
+            if(this.activePlayer >= 0) this.players[this.activePlayer].lockedOut = false;
             this.enableAll();
         },
         wrong(){
-            if(this.status != 1) return;
+            // if(this.status != 1) return;
             this.clickButtonCommand("wrong");
             this.status = 0;
-            this.players[this.activePlayer].lockedOut = true;
+            if(this.activePlayer >= 0) this.players[this.activePlayer].lockedOut = true;
             this.enableAll();
         },
         enableAll(){
