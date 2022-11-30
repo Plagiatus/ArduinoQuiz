@@ -109,26 +109,11 @@
                     </div>
                 </div>
             </div>
-            <div id="jeopardy-wrapper" v-if="isJeopardy">
-                Jeopardy is not ready yet.
-            </div>
+        </div>
+        <div id="jeopardy-wrapper" v-if="isJeopardy">
+            Jeopardy is not ready yet.
         </div>
         <div id="controls-wrapper" v-if="(!displayOnly && settingsVisible)">
-            <div id="controls-points">
-                <h3>Points</h3>
-                <ToggleButton :text="'Display Points'" :enabled="settings.pointsVisible"
-                    @click="togglePointsVisibility" />
-                <div id="numeric-modifier-wrapper">
-                    <label for="point-modifier-input">Point Modifier</label>
-                    <span @click="modifyPointModifier(-1)">-</span>
-                    <input type="number" v-model="settings.pointModifier" id="point-modifier-input">
-                    <span @click="modifyPointModifier(1)">+</span>
-                </div>
-                <ToggleButton :text="'Add Points When Correct'" :enabled="settings.addPointsWhenCorrect"
-                    @click="toggleAddPoints" />
-                <ToggleButton :text="'Deduct Points When Incorrect'" :enabled="settings.deductPointsWhenInorrect"
-                    @click="toggleDeductPoints" />
-            </div>
             <div>
                 <h3>Display</h3>
                 <div id="numeric-modifier-wrapper">
@@ -138,6 +123,8 @@
                     <span @click="modifyCorrectDisplayDuration(1)">+</span>
                 </div>
                 <ToggleButton :text="'Display Names'" :enabled="settings.namesVisible" @click="toggleNamesVisibility" />
+                <ToggleButton :text="'Display Points'" :enabled="settings.pointsVisible"
+                    @click="togglePointsVisibility" />
                 <ToggleButton :text="'Fullscreen'" :enabled="inFullscreen" @click="toggleFullscreen" />
             </div>
             <div>
@@ -150,6 +137,18 @@
                         multiple>
                     <button @click="loadFFData">Load</button>
                 </div>
+                <div v-if="isSimple">
+                    <div id="numeric-modifier-wrapper">
+                        <label for="point-modifier-input">Point Modifier</label>
+                        <span @click="modifyPointModifier(-1)">-</span>
+                        <input type="number" v-model="settings.pointModifier" id="point-modifier-input">
+                        <span @click="modifyPointModifier(1)">+</span>
+                    </div><br>
+                    <ToggleButton :text="'Add Points When Correct'" :enabled="settings.addPointsWhenCorrect"
+                        @click="toggleAddPoints" /> <br>
+                    <ToggleButton :text="'Deduct Points When Incorrect'" :enabled="settings.deductPointsWhenInorrect"
+                        @click="toggleDeductPoints" />
+                </div>
             </div>
             <div>
                 <h3>Danger Zone</h3>
@@ -158,14 +157,17 @@
             </div>
         </div>
         <!-- <KeyboardControls v-if="controlView || showKeyboardControls" /> -->
-        <div id="sideline-btns">
-            <button id="settings-btn" v-if="!displayOnly">
-                <img src="/settings.svg" alt="Settings" class="rotating-img" :class="{rotated: settingsVisible}" @click="toggleSettings">
-            </button>
-            <button id="fullscreen-btn">
-                <img src="/fullscreen.svg" alt="Fullscreen" v-if="!inFullscreen" @click="toggleFullscreen">
-                <img src="/fullscreen_exit.svg" alt="Exit Fullscreen" v-if="inFullscreen" @click="toggleFullscreen">
-            </button>
+        <div id="sideline-btns-wrapper">
+            <div id="sideline-btns">
+                <button id="settings-btn" v-if="!displayOnly">
+                    <img src="/settings.svg" alt="Settings" class="rotating-img" :class="{ rotated: settingsVisible }"
+                        @click="toggleSettings">
+                </button>
+                <button id="fullscreen-btn">
+                    <img src="/fullscreen.svg" alt="Fullscreen" v-if="!inFullscreen" @click="toggleFullscreen">
+                    <img src="/fullscreen_exit.svg" alt="Exit Fullscreen" v-if="inFullscreen" @click="toggleFullscreen">
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -212,7 +214,7 @@ export default defineComponent({
             lastActivePlayer: -1,
             roundProgress: 0,
             gameProgress: 0,
-            
+
 
             hasRecievedNewGameData: false,
             hasRecievedNewActiveQuestion: false,
@@ -667,6 +669,10 @@ input[type="number"] {
     appearance: textfield;
 }
 
+#sideline-btns-wrapper {
+    position: absolute;
+}
+
 #sideline-btns {
     position: fixed;
     bottom: 0;
@@ -675,6 +681,7 @@ input[type="number"] {
     opacity: 0.3;
     transition: opacity ease 0.5s;
 }
+
 #sideline-btns:hover {
     opacity: 1;
 }
@@ -691,6 +698,7 @@ input[type="number"] {
 .rotating-img {
     transition: rotate ease 0.5s;
 }
+
 .rotating-img.rotated {
     rotate: 150deg;
 }
@@ -868,9 +876,11 @@ input[type="number"] {
         flex-direction: column;
         align-items: center;
     }
-    #controls-wrapper > div {
+
+    #controls-wrapper>div {
         margin-top: 3em;
     }
 }
+
 /* #endregion */
 </style>
