@@ -56,7 +56,7 @@ function setupArduinoCommunication() {
     });
     serialParser.on("data", (data) => {
         try {
-            console.log("got data", data);
+            console.log("hardware data:", data);
             io.emit("hardware", JSON.parse(data));
         }
         catch (error) {
