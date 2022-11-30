@@ -267,7 +267,7 @@ export default defineComponent({
             this.activeQuestionData = newQuestionData;
         },
         recieveNewFullQuestionData(newQuestionData: QuestionDataFull) {
-            this.hasRecievedNewActiveQuestion = true;
+            this.hasRecievedNewFullQuestionData = true;
             this.questionData = newQuestionData;
         },
         handleSocketRequest(requestType: string) {
@@ -276,6 +276,8 @@ export default defineComponent({
                     if (Object.keys(this.generalGameData).length > 0) {
                         Socket.socketSendMessage("newData", this.generalGameData);
                         Socket.socketSendMessage("newSettings", this.settings);
+                        Socket.socketSendMessage("newActiveData", this.activeQuestionData);
+                        Socket.socketSendMessage("newQuestionData", this.questionData);
                     }
                     break;
 
