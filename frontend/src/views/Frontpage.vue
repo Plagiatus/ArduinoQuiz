@@ -5,9 +5,9 @@
             <a class="select-view" href="/?page=view&displayOnly=1">
                 Display Only
             </a>
-            <a class="select-view" href="/?page=view">
+            <!-- <a class="select-view" href="/?page=view">
                 Display & Control
-            </a>
+            </a> -->
             <a class="select-view" href="/?page=view&controlView=1">
                 Control View
             </a>

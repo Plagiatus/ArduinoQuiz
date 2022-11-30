@@ -40,14 +40,15 @@
                         <img src="/navigate_before.svg" alt="previous">
                     </div>
                     <div id="ff-game">
-                        <div id="ff-question" :class="{ textHidden: !activeQuestionData.familyFeud?.questionVisible, alwaysDisplay: alwaysDisplayAnswers }"
+                        <div id="ff-question"
+                            :class="{ textHidden: !activeQuestionData.familyFeud?.questionVisible, alwaysDisplay: alwaysDisplayAnswers }"
                             @click="toggleFFQuestion">
                             {{ activeQuestionData.familyFeud?.currentQuestion.question }}
                         </div>
                         <div id="ff-answers-wrapper">
                             <div class="ff-answer"
                                 v-for="(answer, aindex) in activeQuestionData.familyFeud?.currentQuestion.answers"
-                                :class="{ textHidden: !activeQuestionData.familyFeud?.visibleAnswers.includes(aindex), alwaysDisplay: alwaysDisplayAnswers}"
+                                :class="{ textHidden: !activeQuestionData.familyFeud?.visibleAnswers.includes(aindex), alwaysDisplay: alwaysDisplayAnswers }"
                                 @click="toggleFFAnswer(aindex)">
                                 <span class="ff-answer-text"> {{ answer.answer }} </span>
                                 <span class="ff-answer-value"> {{ answer.value }} </span>
@@ -102,7 +103,8 @@
 
                         </div>
                     </div>
-                    <div class="ff-navigation" v-if="!displayOnly" @click="switchToFFQuestion(1)" :disabled="gameProgress === questionData.familyFeud.questions.length - 1">
+                    <div class="ff-navigation" v-if="!displayOnly" @click="switchToFFQuestion(1)"
+                        :disabled="gameProgress === questionData.familyFeud.questions.length - 1">
                         <img src="/navigate_next.svg" alt="next">
                     </div>
                 </div>
@@ -111,7 +113,7 @@
                 Jeopardy is not ready yet.
             </div>
         </div>
-        <div id="controls-wrapper" v-if="!displayOnly">
+        <div id="controls-wrapper" v-if="(!displayOnly && settingsVisible)">
             <div id="controls-points">
                 <h3>Points</h3>
                 <ToggleButton :text="'Display Points'" :enabled="settings.pointsVisible"
@@ -156,10 +158,15 @@
             </div>
         </div>
         <!-- <KeyboardControls v-if="controlView || showKeyboardControls" /> -->
-        <button id="fullscreen-btn">
-            <img src="/fullscreen.svg" alt="Fullscreen" v-if="!inFullscreen" @click="toggleFullscreen">
-            <img src="/fullscreen_exit.svg" alt="Exit Fullscreen" v-if="inFullscreen" @click="toggleFullscreen">
-        </button>
+        <div id="sideline-btns">
+            <button id="settings-btn" v-if="!displayOnly">
+                <img src="/settings.svg" alt="Settings" class="rotating-img" :class="{rotated: settingsVisible}" @click="toggleSettings">
+            </button>
+            <button id="fullscreen-btn">
+                <img src="/fullscreen.svg" alt="Fullscreen" v-if="!inFullscreen" @click="toggleFullscreen">
+                <img src="/fullscreen_exit.svg" alt="Exit Fullscreen" v-if="inFullscreen" @click="toggleFullscreen">
+            </button>
+        </div>
     </div>
 </template>
 
@@ -199,11 +206,13 @@ export default defineComponent({
 
             inFullscreen: false,
             showKeyboardControls: false,
+            alwaysDisplayAnswers: this.controlView,
+            settingsVisible: this.controlView,
             playerCorrect: -1,
             lastActivePlayer: -1,
             roundProgress: 0,
             gameProgress: 0,
-            alwaysDisplayAnswers: this.controlView,
+            
 
             hasRecievedNewGameData: false,
             hasRecievedNewActiveQuestion: false,
@@ -293,6 +302,7 @@ export default defineComponent({
         togglePointsVisibility() { this.settings.pointsVisible = !this.settings.pointsVisible },
         toggleNamesVisibility() { this.settings.namesVisible = !this.settings.namesVisible },
         toggleAlwaysAnswerVisibility() { this.alwaysDisplayAnswers = !this.alwaysDisplayAnswers },
+        toggleSettings() { this.settingsVisible = !this.settingsVisible },
         toggleFullscreen() {
             this.inFullscreen = !this.inFullscreen
             if (this.inFullscreen) {
@@ -655,16 +665,32 @@ input[type="number"] {
     appearance: textfield;
 }
 
-#fullscreen-btn {
-    position: absolute;
+#sideline-btns {
+    position: fixed;
     bottom: 0;
     right: 0;
+    width: 5em;
+    opacity: 0.3;
+    transition: opacity ease 0.5s;
+}
+#sideline-btns:hover {
+    opacity: 1;
+}
+
+#sideline-btns button {
     margin: 0.5em;
     padding: 0.1em;
 }
 
-#fullscreen-btn>img {
+#sideline-btns button>img {
     filter: var(--text-color-filter);
+}
+
+.rotating-img {
+    transition: rotate ease 0.5s;
+}
+.rotating-img.rotated {
+    rotate: 150deg;
 }
 
 #controls-wrapper {
@@ -832,5 +858,17 @@ input[type="number"] {
     font-size: clamp(1em, 2vw, 2em);
 }
 
+/* #endregion */
+
+/* #region small window overrides */
+@media screen and (max-width: 850px) {
+    #controls-wrapper {
+        flex-direction: column;
+        align-items: center;
+    }
+    #controls-wrapper > div {
+        margin-top: 3em;
+    }
+}
 /* #endregion */
 </style>
