@@ -467,7 +467,9 @@ export default defineComponent({
         },
         switchToFFQuestion(modifier: number) {
             if (!this.questionData.familyFeud || !this.activeQuestionData.familyFeud) return;
+            let previous = this.gameProgress;
             this.gameProgress = Math.min(Math.max(this.gameProgress + modifier, 0), this.questionData.familyFeud.questions.length - 1 ?? 0);
+            if(this.gameProgress === previous) return;
             this.roundProgress = 0;
             this.lastActivePlayer = -1;
             this.activeQuestionData.familyFeud.currentQuestion = this.questionData.familyFeud.questions[this.gameProgress];
