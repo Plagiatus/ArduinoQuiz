@@ -37,79 +37,77 @@
                 </div>
             </div>
             <div id="ff-game-wrapper" v-else>
-                <div id="ff-game-and-controls">
-                    <div class="ff-navigation" v-if="!displayOnly" @click="switchToFFQuestion(-1)"
-                        :disabled="gameProgress === 0">
-                        <img src="/navigate_before.svg" alt="previous">
+                <div class="ff-navigation" v-if="!displayOnly" @click="switchToFFQuestion(-1)"
+                    :disabled="gameProgress === 0">
+                    <img src="/navigate_before.svg" alt="previous">
+                </div>
+                <div id="ff-game">
+                    <div id="ff-question"
+                        :class="{ textHidden: !activeQuestionData.familyFeud?.questionVisible, alwaysDisplay: alwaysDisplayAnswers }"
+                        @click="toggleFFQuestion">
+                        {{ activeQuestionData.familyFeud?.currentQuestion.question }}
                     </div>
-                    <div id="ff-game">
-                        <div id="ff-question"
-                            :class="{ textHidden: !activeQuestionData.familyFeud?.questionVisible, alwaysDisplay: alwaysDisplayAnswers }"
-                            @click="toggleFFQuestion">
-                            {{ activeQuestionData.familyFeud?.currentQuestion.question }}
+                    <div id="ff-answers-wrapper">
+                        <div class="ff-answer"
+                            v-for="(answer, aindex) in activeQuestionData.familyFeud?.currentQuestion.answers"
+                            :class="{ textHidden: !activeQuestionData.familyFeud?.visibleAnswers.includes(aindex), alwaysDisplay: alwaysDisplayAnswers }"
+                            @click="toggleFFAnswer(aindex)">
+                            <span class="ff-answer-text"> {{ answer.answer }} </span>
+                            <span class="ff-answer-value"> {{ answer.value }} </span>
                         </div>
-                        <div id="ff-answers-wrapper">
-                            <div class="ff-answer"
-                                v-for="(answer, aindex) in activeQuestionData.familyFeud?.currentQuestion.answers"
-                                :class="{ textHidden: !activeQuestionData.familyFeud?.visibleAnswers.includes(aindex), alwaysDisplay: alwaysDisplayAnswers }"
-                                @click="toggleFFAnswer(aindex)">
-                                <span class="ff-answer-text"> {{ answer.answer }} </span>
-                                <span class="ff-answer-value"> {{ answer.value }} </span>
+                    </div>
+
+                    <div id="ff-player-wrapper">
+                        <div class="ff-one-player">
+                            <div class="ff-player-wrongs" :class="{ active: generalGameData.players[0].active }">
+                                <img src="/close.svg" alt="Mistake 1"
+                                    :class="{ active: activeQuestionData.familyFeud && activeQuestionData.familyFeud.mistakes[0] >= 1 }">
+                                <img src="/close.svg" alt="Mistake 2"
+                                    :class="{ active: activeQuestionData.familyFeud && activeQuestionData.familyFeud.mistakes[0] >= 2 }">
+                                <img src="/close.svg" alt="Mistake 3"
+                                    :class="{ active: activeQuestionData.familyFeud && activeQuestionData.familyFeud.mistakes[0] >= 3 }">
+                            </div>
+                            <div class="ff-player-info" v-if="displayOnly">
+                                <SmoothNumberDisplay class="ff-player-points" v-if="settings.pointsVisible"
+                                    :value="generalGameData.players[0].points" />
+                                <span class="ff-player-name" v-if="settings.namesVisible">
+                                    {{ generalGameData.players[0].name }}</span>
+                            </div>
+                            <div class="ff-player-info" v-else>
+                                <input size="1" class="edit-display ff-player-points" type="number"
+                                    v-model="generalGameData.players[0].points" v-if="settings.pointsVisible">
+                                <input size="1" class="edit-display ff-player-name" type="text"
+                                    v-model="generalGameData.players[0].name" v-if="settings.namesVisible">
+                            </div>
+                        </div>
+                        <div class="ff-one-player">
+                            <div class="ff-player-info" v-if="displayOnly">
+                                <SmoothNumberDisplay class="ff-player-points" v-if="settings.pointsVisible"
+                                    :value="generalGameData.players[1].points" />
+                                <span class="ff-player-name" v-if="settings.namesVisible">
+                                    {{ generalGameData.players[1].name }}</span>
+                            </div>
+                            <div class="ff-player-info" v-else>
+                                <input size="1" class="edit-display ff-player-points" type="number"
+                                    v-model="generalGameData.players[1].points" v-if="settings.pointsVisible">
+                                <input size="1" class="edit-display ff-player-name" type="text"
+                                    v-model="generalGameData.players[1].name" v-if="settings.namesVisible">
+                            </div>
+                            <div class="ff-player-wrongs" :class="{ active: generalGameData.players[1].active }">
+                                <img src="/close.svg" alt="Mistake 1"
+                                    :class="{ active: activeQuestionData.familyFeud && activeQuestionData.familyFeud.mistakes[1] >= 3 }">
+                                <img src="/close.svg" alt="Mistake 2"
+                                    :class="{ active: activeQuestionData.familyFeud && activeQuestionData.familyFeud.mistakes[1] >= 2 }">
+                                <img src="/close.svg" alt="Mistake 3"
+                                    :class="{ active: activeQuestionData.familyFeud && activeQuestionData.familyFeud.mistakes[1] >= 1 }">
                             </div>
                         </div>
 
-                        <div id="ff-player-wrapper">
-                            <div class="ff-one-player">
-                                <div class="ff-player-wrongs" :class="{ active: generalGameData.players[0].active }">
-                                    <img src="/close.svg" alt="Mistake 1"
-                                        :class="{ active: activeQuestionData.familyFeud && activeQuestionData.familyFeud.mistakes[0] >= 1 }">
-                                    <img src="/close.svg" alt="Mistake 2"
-                                        :class="{ active: activeQuestionData.familyFeud && activeQuestionData.familyFeud.mistakes[0] >= 2 }">
-                                    <img src="/close.svg" alt="Mistake 3"
-                                        :class="{ active: activeQuestionData.familyFeud && activeQuestionData.familyFeud.mistakes[0] >= 3 }">
-                                </div>
-                                <div class="ff-player-info" v-if="displayOnly">
-                                    <SmoothNumberDisplay class="ff-player-points" v-if="settings.pointsVisible"
-                                        :value="generalGameData.players[0].points" />
-                                    <span class="ff-player-name" v-if="settings.namesVisible">
-                                        {{ generalGameData.players[0].name }}</span>
-                                </div>
-                                <div class="ff-player-info" v-else>
-                                    <input size="1" class="edit-display ff-player-points" type="number"
-                                        v-model="generalGameData.players[0].points" v-if="settings.pointsVisible">
-                                    <input size="1" class="edit-display ff-player-name" type="text"
-                                        v-model="generalGameData.players[0].name" v-if="settings.namesVisible">
-                                </div>
-                            </div>
-                            <div class="ff-one-player">
-                                <div class="ff-player-info" v-if="displayOnly">
-                                    <SmoothNumberDisplay class="ff-player-points" v-if="settings.pointsVisible"
-                                        :value="generalGameData.players[1].points" />
-                                    <span class="ff-player-name" v-if="settings.namesVisible">
-                                        {{ generalGameData.players[1].name }}</span>
-                                </div>
-                                <div class="ff-player-info" v-else>
-                                    <input size="1" class="edit-display ff-player-points" type="number"
-                                        v-model="generalGameData.players[1].points" v-if="settings.pointsVisible">
-                                    <input size="1" class="edit-display ff-player-name" type="text"
-                                        v-model="generalGameData.players[1].name" v-if="settings.namesVisible">
-                                </div>
-                                <div class="ff-player-wrongs" :class="{ active: generalGameData.players[1].active }">
-                                    <img src="/close.svg" alt="Mistake 1"
-                                        :class="{ active: activeQuestionData.familyFeud && activeQuestionData.familyFeud.mistakes[1] >= 1 }">
-                                    <img src="/close.svg" alt="Mistake 2"
-                                        :class="{ active: activeQuestionData.familyFeud && activeQuestionData.familyFeud.mistakes[1] >= 2 }">
-                                    <img src="/close.svg" alt="Mistake 3"
-                                        :class="{ active: activeQuestionData.familyFeud && activeQuestionData.familyFeud.mistakes[1] >= 3 }">
-                                </div>
-                            </div>
-
-                        </div>
                     </div>
-                    <div class="ff-navigation" v-if="!displayOnly" @click="switchToFFQuestion(1)"
-                        :disabled="gameProgress === questionData.familyFeud.questions.length - 1">
-                        <img src="/navigate_next.svg" alt="next">
-                    </div>
+                </div>
+                <div class="ff-navigation" v-if="!displayOnly" @click="switchToFFQuestion(1)"
+                    :disabled="gameProgress === questionData.familyFeud.questions.length - 1">
+                    <img src="/navigate_next.svg" alt="next">
                 </div>
             </div>
         </div>
@@ -117,47 +115,41 @@
             Jeopardy is not ready yet.
         </div>
         <div id="controls-wrapper" v-if="(!displayOnly && settingsVisible)">
-            <div>
+            <div class="controls-inner-wrapper">
                 <h3>Display</h3>
-                <div id="numeric-modifier-wrapper">
-                    <label for="correct-display-input">Correct Display Duration</label>
-                    <span @click="modifyCorrectDisplayDuration(-1)">-</span>
-                    <input type="number" v-model="settings.correctDisplayDuration" id="correct-display-input" min="0">
-                    <span @click="modifyCorrectDisplayDuration(1)">+</span>
-                </div>
+                <NumericModifier :label="'Correct Display Duration'" :min="0" :value="settings.correctDisplayDuration"
+                    @modify-value="modifyCorrectDisplayDuration" />
                 <ToggleButton :text="'Display Names'" :enabled="settings.namesVisible" @click="toggleNamesVisibility" />
                 <ToggleButton :text="'Display Points'" :enabled="settings.pointsVisible"
                     @click="togglePointsVisibility" />
                 <ToggleButton :text="'Fullscreen'" :enabled="inFullscreen" @click="toggleFullscreen" />
             </div>
-            <div>
+            <div class="controls-inner-wrapper">
                 <h3>Game Specific</h3>
-                <div v-if="isFamilyFeud || isJeopardy">
+                <div v-if="isFamilyFeud || isJeopardy" class="controls-inner-wrapper">
                     <ToggleButton :text="'Always show answers'" :enabled="alwaysDisplayAnswers"
-                        @click="toggleAlwaysAnswerVisibility" /> <br>
-                    <label for="file-loader-in-settings">Game files</label><br>
-                    <input type="file" accept="application/json" @change="setFilesToLoad" id="file-loader-in-settings"
-                        multiple>
-                    <button @click="loadFFData">Load</button>
+                        @click="toggleAlwaysAnswerVisibility" />
+                    <div>
+                        <label for="file-loader-in-settings">Game files</label><br>
+                        <input type="file" accept="application/json" @change="setFilesToLoad"
+                            id="file-loader-in-settings" multiple> <br>
+                        <button @click="loadFFData">Load</button>
+                    </div>
                 </div>
-                <div v-if="isSimple">
-                    <div id="numeric-modifier-wrapper">
-                        <label for="point-modifier-input">Point Modifier</label>
-                        <span @click="modifyPointModifier(-1)">-</span>
-                        <input type="number" v-model="settings.pointModifier" id="point-modifier-input">
-                        <span @click="modifyPointModifier(1)">+</span>
-                    </div><br>
+                <div v-if="isSimple" class="controls-inner-wrapper">
+                    <NumericModifier :label="'Point Modifier'" :value="settings.pointModifier"
+                        @modify-value="modifyPointModifier" />
                     <ToggleButton :text="'Add Points When Correct'" :enabled="settings.addPointsWhenCorrect"
-                        @click="toggleAddPoints" /> <br>
+                        @click="toggleAddPoints" />
                     <ToggleButton :text="'Deduct Points When Incorrect'" :enabled="settings.deductPointsWhenInorrect"
                         @click="toggleDeductPoints" />
                 </div>
             </div>
-            <div>
+            <div class="controls-inner-wrapper">
                 <h3>Danger Zone</h3>
                 <button @click="addPlayer" v-if="isSimple">Add Player</button>
-                <button @click="newGame">New Game</button>
-                <button @click="switchToNextGametype">Switch to {{ nextGameType }}</button>
+                <button class="btn-red" @click="newGame">New Game</button>
+                <button class="btn-red" @click="switchToNextGametype">Switch to {{ nextGameType }}</button>
             </div>
         </div>
         <!-- <KeyboardControls v-if="controlView || showKeyboardControls" /> -->
@@ -183,10 +175,11 @@ import { GameData, GameType, HardwareCommand, Settings, QuestionDataCurrent, Que
 import KeyboardControls from "../components/KeyboardControls.vue";
 import ToggleButton from "../components/ToggleButton.vue";
 import SmoothNumberDisplay from "../components/SmoothNumberDisplay.vue";
+import NumericModifier from "../components/NumericModifier.vue";
 
 
 export default defineComponent({
-    components: { KeyboardControls, ToggleButton, SmoothNumberDisplay },
+    components: { KeyboardControls, ToggleButton, SmoothNumberDisplay, NumericModifier },
     props: {
         displayOnly: Boolean,
         controlView: Boolean,
@@ -331,7 +324,7 @@ export default defineComponent({
             this.roundProgress = 0;
         },
         modifyPointModifier(amt: number) { this.settings.pointModifier += amt; },
-        modifyCorrectDisplayDuration(amt: number) { this.settings.correctDisplayDuration += amt; },
+        modifyCorrectDisplayDuration(amt: number) { this.settings.correctDisplayDuration = Math.max(0, this.settings.correctDisplayDuration + amt); },
         removePlayer(index: number) {
             if (index >= 0 && this.generalGameData.players.length > index && this.generalGameData.players.length > 2) {
                 this.generalGameData.players.splice(index, 1);
@@ -616,6 +609,8 @@ code {
     flex-direction: row;
     justify-content: space-evenly;
     gap: 2px;
+    align-items: center;
+    flex-grow: 1;
 }
 
 .player {
@@ -627,7 +622,7 @@ code {
 }
 
 .player-status {
-    border: 10px solid white;
+    border: 10px solid var(--text-color);
     margin-bottom: 1em;
     min-height: 10vw;
     min-width: 10vw;
@@ -637,7 +632,7 @@ code {
 }
 
 .player-status.active {
-    background-color: var(--active);
+    background-color: var(--highlight);
 }
 
 .player-status.locked {
@@ -662,7 +657,7 @@ code {
     filter: var(--green-filter)
 }
 
-.player-status:hover > .delete-btn {
+.player-status:hover>.delete-btn {
     opacity: 1;
 }
 
@@ -741,41 +736,27 @@ input[type="number"] {
     margin-top: 2em;
 }
 
-#controls-wrapper>div {
+.controls-inner-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 0.5em;
     height: 100%;
 }
 
-#numeric-modifier-wrapper {
-    user-select: none;
-    display: flex;
-}
-
-#numeric-modifier-wrapper>input {
-    border: none;
-    width: 3em;
-    flex-grow: 1;
-}
-
-#numeric-modifier-wrapper>* {
-    padding: 0.6em;
-    text-align: center;
-}
-
-#numeric-modifier-wrapper>span {
-    background-color: var(--bg-color2);
-    cursor: pointer;
-    border: 1px solid var(--text-color);
-    font-weight: 800;
-    width: 2em;
-    display: inline-block;
+.btn-red {
+    background-color: var(--red);
 }
 
 /* #region Family Feud*/
-#ff-game-and-controls {
+#ff-wrapper {
     display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+#ff-game-wrapper {
+    display: flex;
+    flex-grow: 1;
 }
 
 #ff-game {
@@ -793,6 +774,7 @@ input[type="number"] {
     display: flex;
     align-items: center;
     margin: 0 1em;
+    min-width: 3em;
 }
 
 .ff-navigation>img {
@@ -860,7 +842,7 @@ input[type="number"] {
 }
 
 .ff-player-wrongs.active {
-    background-color: var(--active);
+    background-color: var(--highlight);
 }
 
 .ff-player-wrongs>img {

@@ -27,11 +27,13 @@ export default defineComponent({
     cursor: pointer;
     display: inline-flex;
     border-radius: 8px;
-    background-color: var(--btn-background);
     padding: 0;
+    color: var(--text-color);
+    background-color: transparent;
 }
 
 .toggle-btn-text {
+    background-color: var(--bg-color2);
     flex-grow: 1;
     padding: 0.6em 0.6em 0.6em 1.2em;
     border-top-left-radius: 8px;
@@ -39,16 +41,17 @@ export default defineComponent({
 }
 .toggle-btn-status {
     padding: 0.6em;
+    margin-left: 0.2em;
     width: 3em;
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
     /* transition: 0.5s linear transform; */
 }
 .toggle-btn-on {
-    background-color: green;
+    background-color: var(--highlight);
 }
 .toggle-btn-off {
-    background-color: rgb(187, 3, 3);
+    background-color: var(--bg-color2);
 }
 /* 
 .toggle-btn-on {
