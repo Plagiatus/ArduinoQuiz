@@ -1,6 +1,6 @@
 <template>
     <div id="gameview">
-        <div id="player-wrapper" v-if="isSimple"
+        <div id="simple-wrapper" v-if="isSimple"
             :style="{ fontSize: `clamp(1em, calc(8vw / ${generalGameData.players.length}), 4em)` }">
             <div class="player" v-for="(player, pindex) in generalGameData.players"
                 :style="{ width: dimensionsBasedOnPlayer }">
@@ -9,6 +9,9 @@
                     :style="{ width: dimensionsBasedOnPlayer, height: dimensionsBasedOnPlayer }">
                     <img class="player-status-locked" src="/close.svg" v-if="player.locked">
                     <img class="player-status-correct" src="/check.svg" v-else-if="playerCorrect == pindex">
+                    <img class="delete-btn" src="/delete.svg" alt="Delete"
+                        v-if="(!displayOnly && settingsVisible && generalGameData.players.length > 2)"
+                        @click="removePlayer(pindex)">
                 </div>
                 <div class="name-and-score-wrapper" v-if="!displayOnly">
                     <input size="1" class="edit-display" type="text" v-model="player.name" v-if="settings.namesVisible">
@@ -152,6 +155,7 @@
             </div>
             <div>
                 <h3>Danger Zone</h3>
+                <button @click="addPlayer" v-if="isSimple">Add Player</button>
                 <button @click="newGame">New Game</button>
                 <button @click="switchToNextGametype">Switch to {{ nextGameType }}</button>
             </div>
@@ -320,11 +324,22 @@ export default defineComponent({
             if (this.generalGameData.type > Object.keys(GameType).length / 2) {
                 this.generalGameData.type = 1;
             }
+            while (this.generalGameData.players.length < 2) {
+                this.generalGameData.players.push({ active: false, locked: false, name: "", points: 0 })
+            }
             this.lastActivePlayer = -1;
             this.roundProgress = 0;
         },
         modifyPointModifier(amt: number) { this.settings.pointModifier += amt; },
         modifyCorrectDisplayDuration(amt: number) { this.settings.correctDisplayDuration += amt; },
+        removePlayer(index: number) {
+            if (index >= 0 && this.generalGameData.players.length > index && this.generalGameData.players.length > 2) {
+                this.generalGameData.players.splice(index, 1);
+            }
+        },
+        addPlayer() {
+            this.generalGameData.players.push({ active: false, locked: false, name: "", points: 0 })
+        },
         //#endregion 
 
         //#region hardware handling
@@ -596,7 +611,7 @@ code {
     padding: 0.1em;
 }
 
-#player-wrapper {
+#simple-wrapper {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
@@ -618,6 +633,7 @@ code {
     min-width: 10vw;
     max-height: 50vh;
     max-width: 50vh;
+    position: relative;
 }
 
 .player-status.active {
@@ -644,6 +660,20 @@ code {
     width: 100%;
     height: 100%;
     filter: var(--green-filter)
+}
+
+.player-status:hover > .delete-btn {
+    opacity: 1;
+}
+
+.delete-btn {
+    filter: var(--red-filter);
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    opacity: 0.1;
+    transition: opacity ease .3s;
 }
 
 .name-and-score-wrapper {
