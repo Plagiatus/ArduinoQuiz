@@ -35,18 +35,19 @@
             </div>
             <div id="ff-game-wrapper" v-else>
                 <div id="ff-game-and-controls">
-                    <div class="ff-navigation" v-if="!displayOnly" @click="switchToFFQuestion(-1)" :disabled="gameProgress === 0">
+                    <div class="ff-navigation" v-if="!displayOnly" @click="switchToFFQuestion(-1)"
+                        :disabled="gameProgress === 0">
                         <img src="/navigate_before.svg" alt="previous">
                     </div>
                     <div id="ff-game">
-                        <div id="ff-question" :class="{ textHidden: !activeQuestionData.familyFeud?.questionVisible }"
+                        <div id="ff-question" :class="{ textHidden: !activeQuestionData.familyFeud?.questionVisible, alwaysDisplay: alwaysDisplayAnswers }"
                             @click="toggleFFQuestion">
                             {{ activeQuestionData.familyFeud?.currentQuestion.question }}
                         </div>
                         <div id="ff-answers-wrapper">
                             <div class="ff-answer"
                                 v-for="(answer, aindex) in activeQuestionData.familyFeud?.currentQuestion.answers"
-                                :class="{ textHidden: !activeQuestionData.familyFeud?.visibleAnswers.includes(aindex) }"
+                                :class="{ textHidden: !activeQuestionData.familyFeud?.visibleAnswers.includes(aindex), alwaysDisplay: alwaysDisplayAnswers}"
                                 @click="toggleFFAnswer(aindex)">
                                 <span class="ff-answer-text"> {{ answer.answer }} </span>
                                 <span class="ff-answer-value"> {{ answer.value }} </span>
@@ -140,6 +141,8 @@
             <div>
                 <h3>Game Specific</h3>
                 <div v-if="isFamilyFeud || isJeopardy">
+                    <ToggleButton :text="'Always show answers'" :enabled="alwaysDisplayAnswers"
+                        @click="toggleAlwaysAnswerVisibility" /> <br>
                     <label for="file-loader-in-settings">Game files</label><br>
                     <input type="file" accept="application/json" @change="setFilesToLoad" id="file-loader-in-settings"
                         multiple>
@@ -200,6 +203,7 @@ export default defineComponent({
             lastActivePlayer: -1,
             roundProgress: 0,
             gameProgress: 0,
+            alwaysDisplayAnswers: this.controlView,
 
             hasRecievedNewGameData: false,
             hasRecievedNewActiveQuestion: false,
@@ -288,6 +292,7 @@ export default defineComponent({
         toggleDeductPoints() { this.settings.deductPointsWhenInorrect = !this.settings.deductPointsWhenInorrect },
         togglePointsVisibility() { this.settings.pointsVisible = !this.settings.pointsVisible },
         toggleNamesVisibility() { this.settings.namesVisible = !this.settings.namesVisible },
+        toggleAlwaysAnswerVisibility() { this.alwaysDisplayAnswers = !this.alwaysDisplayAnswers },
         toggleFullscreen() {
             this.inFullscreen = !this.inFullscreen
             if (this.inFullscreen) {
@@ -469,7 +474,7 @@ export default defineComponent({
             if (!this.questionData.familyFeud || !this.activeQuestionData.familyFeud) return;
             let previous = this.gameProgress;
             this.gameProgress = Math.min(Math.max(this.gameProgress + modifier, 0), this.questionData.familyFeud.questions.length - 1 ?? 0);
-            if(this.gameProgress === previous) return;
+            if (this.gameProgress === previous) return;
             this.roundProgress = 0;
             this.lastActivePlayer = -1;
             this.activeQuestionData.familyFeud.currentQuestion = this.questionData.familyFeud.questions[this.gameProgress];
@@ -713,7 +718,7 @@ input[type="number"] {
     user-select: none;
 }
 
-.ff-navigation:hover:not([disabled = "true"]) {
+.ff-navigation:hover:not([disabled="true"]) {
     background-color: var(--bg-color2);
     cursor: pointer;
 }
@@ -723,18 +728,24 @@ input[type="number"] {
     align-items: center;
     margin: 0 1em;
 }
+
 .ff-navigation>img {
     filter: var(--text-color-filter);
     width: 3em;
     height: 3em;
 }
+
 .ff-navigation[disabled="true"]>img {
     opacity: 0.2;
 }
 
-.textHidden {
+.textHidden:not(.alwaysDisplay) {
     /* font-size: 0 !important; */
     color: rgba(0, 0, 0, 0);
+}
+
+.alwaysDisplay.textHidden {
+    opacity: 0.5;
 }
 
 #ff-question {
