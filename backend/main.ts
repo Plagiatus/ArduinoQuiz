@@ -11,11 +11,13 @@ app.use(express.static("../frontend/dist/"));
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
-server.listen(9090, () => { displayConnectionIPs(); });
+const port = argv[3] ?? 9090;
+
+server.listen(port, () => { displayConnectionIPs(); });
 
 io.on("connection", (socket) => {
 	socket.onAny((event, data) => {
-		console.log({ event, data })
+		// console.log({ event, data });
 		socket.broadcast.emit(event, data);
 	});
 })
@@ -34,7 +36,7 @@ function setupArduinoCommunication() {
 	})
 	serialParser.on("data", (data: string) => {
 		try {
-			console.log("hardware data:", data);
+			// console.log("hardware data:", data);
 			io.emit("hardware", JSON.parse(data));
 		} catch (error) {
 			console.error(error);
@@ -55,7 +57,7 @@ function displayConnectionIPs() {
 					results[name] = [];
 				}
 				results[name].push(net.address);
-				console.log("\x1b[32m\x1b[1m%s\x1b[0m", `  http://${net.address}:9090`);
+				console.log("\x1b[32m\x1b[1m%s\x1b[0m", `  http://${net.address}:${port}`);
 			}
 		}
 	}

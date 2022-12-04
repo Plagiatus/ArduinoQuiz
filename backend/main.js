@@ -25,6 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const socket_io_1 = require("socket.io");
@@ -36,10 +37,11 @@ const app = (0, express_1.default)();
 app.use(express_1.default.static("../frontend/dist/"));
 const server = http.createServer(app);
 const io = new socket_io_1.Server(server, { cors: { origin: "*" } });
-server.listen(9090, () => { displayConnectionIPs(); });
+const port = (_a = process_1.argv[3]) !== null && _a !== void 0 ? _a : 9090;
+server.listen(port, () => { displayConnectionIPs(); });
 io.on("connection", (socket) => {
     socket.onAny((event, data) => {
-        console.log({ event, data });
+        // console.log({ event, data });
         socket.broadcast.emit(event, data);
     });
 });
@@ -56,7 +58,7 @@ function setupArduinoCommunication() {
     });
     serialParser.on("data", (data) => {
         try {
-            console.log("hardware data:", data);
+            // console.log("hardware data:", data);
             io.emit("hardware", JSON.parse(data));
         }
         catch (error) {
@@ -77,7 +79,7 @@ function displayConnectionIPs() {
                     results[name] = [];
                 }
                 results[name].push(net.address);
-                console.log("\x1b[32m\x1b[1m%s\x1b[0m", `  http://${net.address}:9090`);
+                console.log("\x1b[32m\x1b[1m%s\x1b[0m", `  http://${net.address}:${port}`);
             }
         }
     }
