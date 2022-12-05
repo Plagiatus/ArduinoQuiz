@@ -1,6 +1,6 @@
 const int buttons = 3;
-const int inputs[] = { 2, 4, 6, 8 };
-const int outputs[] = { 3, 5, 7, 9 };
+const int inputs[] = { 2, 3, 4, 5 };
+const int outputs[] = { 6, 7, 8, 9 };
 const int RIGHT_PIN = 10;
 const int WRONG_PIN = 11;
 const int RESET_PIN = 12;
