@@ -1,4 +1,4 @@
-const int buttons = 3;
+const int buttons = 4;
 const int inputs[] = { 2, 3, 4, 5 };
 const int outputs[] = { 6, 7, 8, 9 };
 const int RIGHT_PIN = 10;
