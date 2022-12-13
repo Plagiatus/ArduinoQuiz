@@ -1,4 +1,7 @@
 # ArduinoQuiz
+
+![Screenshot](https://user-images.githubusercontent.com/7681159/207215220-6b675ad1-3486-4e9f-99b7-ded22e3942ff.png)
+
 A Quiz system using an arduino as the input and an optional website as the display, connected through node.js
 
 You can use the hardware without connecting it to a PC if you power it through e.g. a battery instead, that way the frontend isn't needed. It's just an optional addon.
@@ -6,7 +9,18 @@ You can use the hardware without connecting it to a PC if you power it through e
 For now the frontend supports two gametypes: 
 
 1. a basic display that shows who pressed their button first, if something was wrong or correct and lets you automatically count points. Supports any number of players.  
-2. A FamilyFeud option, which 
+2. A FamilyFeud option, which needs a json file with the questions to be able to display them. Have a look at the provided examples for guidance.
+
+![Lightmode](https://user-images.githubusercontent.com/7681159/207215381-23b46030-0cab-4e9e-bfd5-bc41a369fcca.png)
+_Lightmode example of the basic view with settings._
+
+![Darkmode](https://user-images.githubusercontent.com/7681159/207215397-9b8768b3-704c-48c8-b83f-d3b217f90de5.png)
+_Darkmode example of the Family Feud display without visible settings._
+
+
+The frontend also comes equipped to adjust to your prefered color scheme automatically.
+
+There are two options for frontends: A clean "Display Only" view, as well as a "Control View". **At least one Control View is needed to start playing a game**, however you can disable (almost) all control settings to make it look almost like a display view. Thus the display only is meant to be used in tandem with a control view on a different screen (e.g. the gamemasters phone).
 
 # Hardware 
 
@@ -90,5 +104,7 @@ By default the game will be served on **port 9090**. If you want/need to change 
 - clean up GameView, probably into multiple components
 - add more quiz styles
 	- jeopardy
+	- go for gold
 - add sounds
 - add a way to play with phones instead of arduino hardware
+- control arduino through game
