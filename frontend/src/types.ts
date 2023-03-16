@@ -63,11 +63,13 @@ interface HardwarePlayerCommand {
 }
 
 export interface Settings {
-    pointModifier: number,
+    pointModifierCorrect: number,
+    pointModifierIncorrect: number,
     correctDisplayDuration: number,
 
     namesVisible: boolean,
     pointsVisible: boolean,
-    addPointsWhenCorrect: boolean,
-    deductPointsWhenInorrect: boolean,
+
+    addPointsWhenIncorrect: boolean,
+    addPointsToOthersWhenIncorrect: boolean,
 } 

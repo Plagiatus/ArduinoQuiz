@@ -137,12 +137,14 @@
                     </div>
                 </div>
                 <div v-if="isSimple" class="controls-inner-wrapper">
-                    <NumericModifier :label="'Point Modifier'" :value="settings.pointModifier"
-                        @modify-value="modifyPointModifier" />
-                    <ToggleButton :text="'Add Points When Correct'" :enabled="settings.addPointsWhenCorrect"
-                        @click="toggleAddPoints" />
-                    <ToggleButton :text="'Deduct Points When Incorrect'" :enabled="settings.deductPointsWhenInorrect"
-                        @click="toggleDeductPoints" />
+                    <NumericModifier :label="'Point Modifier Correct'" :value="settings.pointModifierCorrect"
+                        @modify-value="modifyPointModifierCorrect" />
+                    <NumericModifier :label="'Point Modifier Incorrect'" :value="settings.pointModifierIncorrect"
+                        @modify-value="modifyPointModifierIncorrect" />
+                    <ToggleButton :text="'Add Points When Incorrect'" :enabled="settings.addPointsWhenIncorrect"
+                        @click="toggleAddPointsWhenIncorrect" />
+                    <ToggleButton :text="'Add Points To Others When Incorrect'" :enabled="settings.addPointsToOthersWhenIncorrect"
+                        @click="toggleAddPointsToOthersWhenIncorrect" />
                 </div>
             </div>
             <div class="controls-inner-wrapper">
@@ -197,10 +199,11 @@ export default defineComponent({
             settings: {
                 namesVisible: true,
                 pointsVisible: true,
-                pointModifier: 1,
+                pointModifierCorrect: 1,
+                pointModifierIncorrect: 1,
                 correctDisplayDuration: 3,
-                addPointsWhenCorrect: true,
-                deductPointsWhenInorrect: true,
+                addPointsWhenIncorrect: true,
+                addPointsToOthersWhenIncorrect: false,
             } as Settings,
 
             inFullscreen: false,
@@ -298,8 +301,8 @@ export default defineComponent({
             }
         },
         //#region settings
-        toggleAddPoints() { this.settings.addPointsWhenCorrect = !this.settings.addPointsWhenCorrect },
-        toggleDeductPoints() { this.settings.deductPointsWhenInorrect = !this.settings.deductPointsWhenInorrect },
+        toggleAddPointsWhenIncorrect() { this.settings.addPointsWhenIncorrect = !this.settings.addPointsWhenIncorrect },
+        toggleAddPointsToOthersWhenIncorrect() { this.settings.addPointsToOthersWhenIncorrect = !this.settings.addPointsToOthersWhenIncorrect },
         togglePointsVisibility() { this.settings.pointsVisible = !this.settings.pointsVisible },
         toggleNamesVisibility() { this.settings.namesVisible = !this.settings.namesVisible },
         toggleAlwaysAnswerVisibility() { this.alwaysDisplayAnswers = !this.alwaysDisplayAnswers },
@@ -323,7 +326,8 @@ export default defineComponent({
             this.lastActivePlayer = -1;
             this.roundProgress = 0;
         },
-        modifyPointModifier(amt: number) { this.settings.pointModifier += amt; },
+        modifyPointModifierCorrect(amt: number) { this.settings.pointModifierCorrect += amt; },
+        modifyPointModifierIncorrect(amt: number) { this.settings.pointModifierIncorrect += amt; },
         modifyCorrectDisplayDuration(amt: number) { this.settings.correctDisplayDuration = Math.max(0, this.settings.correctDisplayDuration + amt); },
         removePlayer(index: number) {
             if (index >= 0 && this.generalGameData.players.length > index && this.generalGameData.players.length > 2) {
@@ -345,9 +349,7 @@ export default defineComponent({
                             if (p.active == true || this.lastActivePlayer === i) {
                                 p.active = false;
                                 p.locked = false;
-                                if (this.settings.addPointsWhenCorrect) {
-                                    p.points += this.settings.pointModifier;
-                                }
+                                p.points += this.settings.pointModifierCorrect;
                                 this.playerCorrect = i;
                                 if (this.correctDisplayTimeout) clearTimeout(this.correctDisplayTimeout);
                                 this.correctDisplayTimeout = setTimeout(() => { this.playerCorrect = -1 }, this.settings.correctDisplayDuration * 1000);
@@ -360,8 +362,14 @@ export default defineComponent({
                             if (p.active == true || this.lastActivePlayer === i) {
                                 p.active = false;
                                 p.locked = true;
-                                if (this.settings.deductPointsWhenInorrect) {
-                                    p.points -= this.settings.pointModifier;
+                                if (this.settings.addPointsWhenIncorrect) {
+                                    p.points += this.settings.pointModifierIncorrect;
+                                } 
+                                if (this.settings.addPointsToOthersWhenIncorrect) {
+                                    for(let player of this.generalGameData.players){
+                                        if(player === p) continue;
+                                        player.points += this.settings.pointModifierIncorrect;
+                                    }
                                 }
                             }
                         }
