@@ -12,6 +12,7 @@
                     <img class="delete-btn" src="/delete.svg" alt="Delete"
                         v-if="(!displayOnly && settingsVisible && generalGameData.players.length > 2)"
                         @click="removePlayer(pindex)">
+                    <Timer :duration="settings.timer" v-if="isTimerActive && player.active"></Timer>
                 </div>
                 <div class="name-and-score-wrapper" v-if="!displayOnly">
                     <input size="1" class="edit-display" type="text" v-model="player.name" v-if="settings.namesVisible">
@@ -20,8 +21,7 @@
                 </div>
                 <div class="name-and-score-wrapper" v-else>
                     <span class="edit-display" v-if="settings.namesVisible">{{ player.name }}</span>
-                    <SmoothNumberDisplay class="ff-player-points" v-if="settings.pointsVisible"
-                        :value="player.points" />
+                    <SmoothNumberDisplay class="ff-player-points" v-if="settings.pointsVisible" :value="player.points" />
                 </div>
             </div>
         </div>
@@ -120,8 +120,7 @@
                 <NumericModifier :label="'Correct Display Duration'" :min="0" :value="settings.correctDisplayDuration"
                     @modify-value="modifyCorrectDisplayDuration" />
                 <ToggleButton :text="'Display Names'" :enabled="settings.namesVisible" @click="toggleNamesVisibility" />
-                <ToggleButton :text="'Display Points'" :enabled="settings.pointsVisible"
-                    @click="togglePointsVisibility" />
+                <ToggleButton :text="'Display Points'" :enabled="settings.pointsVisible" @click="togglePointsVisibility" />
                 <ToggleButton :text="'Fullscreen'" :enabled="inFullscreen" @click="toggleFullscreen" />
             </div>
             <div class="controls-inner-wrapper">
@@ -131,8 +130,8 @@
                         @click="toggleAlwaysAnswerVisibility" />
                     <div>
                         <label for="file-loader-in-settings">Game files</label><br>
-                        <input type="file" accept="application/json" @change="setFilesToLoad"
-                            id="file-loader-in-settings" multiple> <br>
+                        <input type="file" accept="application/json" @change="setFilesToLoad" id="file-loader-in-settings"
+                            multiple> <br>
                         <button @click="loadFFData">Load</button>
                     </div>
                 </div>
@@ -143,8 +142,10 @@
                         @modify-value="modifyPointModifierIncorrect" />
                     <ToggleButton :text="'Add Points When Incorrect'" :enabled="settings.addPointsWhenIncorrect"
                         @click="toggleAddPointsWhenIncorrect" />
-                    <ToggleButton :text="'Add Points To Others When Incorrect'" :enabled="settings.addPointsToOthersWhenIncorrect"
-                        @click="toggleAddPointsToOthersWhenIncorrect" />
+                    <ToggleButton :text="'Add Points To Others When Incorrect'"
+                        :enabled="settings.addPointsToOthersWhenIncorrect" @click="toggleAddPointsToOthersWhenIncorrect" />
+                    <NumericModifier :label="'Timer (0 to disable)'" :value="settings.timer"
+                        @modify-value="modifyTimer" />
                 </div>
             </div>
             <div class="controls-inner-wrapper">
@@ -178,10 +179,11 @@ import KeyboardControls from "../components/KeyboardControls.vue";
 import ToggleButton from "../components/ToggleButton.vue";
 import SmoothNumberDisplay from "../components/SmoothNumberDisplay.vue";
 import NumericModifier from "../components/NumericModifier.vue";
+import Timer from "../components/Timer.vue";
 
 
 export default defineComponent({
-    components: { KeyboardControls, ToggleButton, SmoothNumberDisplay, NumericModifier },
+    components: { KeyboardControls, ToggleButton, SmoothNumberDisplay, NumericModifier, Timer },
     props: {
         displayOnly: Boolean,
         controlView: Boolean,
@@ -204,6 +206,7 @@ export default defineComponent({
                 correctDisplayDuration: 3,
                 addPointsWhenIncorrect: true,
                 addPointsToOthersWhenIncorrect: false,
+                timer: 0,
             } as Settings,
 
             inFullscreen: false,
@@ -220,6 +223,8 @@ export default defineComponent({
             hasRecievedNewActiveQuestion: false,
             hasRecievedNewFullQuestionData: false,
             hasRecievedNewSettings: false,
+
+            isTimerActive: false,
         }
     },
     methods: {
@@ -329,6 +334,7 @@ export default defineComponent({
         modifyPointModifierCorrect(amt: number) { this.settings.pointModifierCorrect += amt; },
         modifyPointModifierIncorrect(amt: number) { this.settings.pointModifierIncorrect += amt; },
         modifyCorrectDisplayDuration(amt: number) { this.settings.correctDisplayDuration = Math.max(0, this.settings.correctDisplayDuration + amt); },
+        modifyTimer(amt: number) { this.settings.timer = Math.max(0, this.settings.timer + amt); },
         removePlayer(index: number) {
             if (index >= 0 && this.generalGameData.players.length > index && this.generalGameData.players.length > 2) {
                 this.generalGameData.players.splice(index, 1);
@@ -342,6 +348,7 @@ export default defineComponent({
         //#region hardware handling
         hardwareHandlingSimple(hc: HardwareCommand): void {
             if ("command" in hc) {
+                this.isTimerActive = false;
                 switch (hc.command) {
                     case 'correct':
                         for (let i = 0; i < this.generalGameData.players.length; i++) {
@@ -364,10 +371,10 @@ export default defineComponent({
                                 p.locked = true;
                                 if (this.settings.addPointsWhenIncorrect) {
                                     p.points += this.settings.pointModifierIncorrect;
-                                } 
+                                }
                                 if (this.settings.addPointsToOthersWhenIncorrect) {
-                                    for(let player of this.generalGameData.players){
-                                        if(player === p) continue;
+                                    for (let player of this.generalGameData.players) {
+                                        if (player === p) continue;
                                         player.points += this.settings.pointModifierIncorrect;
                                     }
                                 }
@@ -389,6 +396,9 @@ export default defineComponent({
                 if (this.generalGameData.players[hc.player]) {
                     this.generalGameData.players[hc.player].active = true;
                     this.lastActivePlayer = hc.player;
+                    if(this.settings.timer > 0){
+                        this.isTimerActive = true;
+                    }
                 }
             }
         },

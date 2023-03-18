@@ -72,4 +72,6 @@ export interface Settings {
 
     addPointsWhenIncorrect: boolean,
     addPointsToOthersWhenIncorrect: boolean,
+
+    timer: number
 } 
