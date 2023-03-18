@@ -836,7 +836,7 @@ input[type="number"] {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1em;
-    margin-top: 2em;
+    margin-top: clamp(1.5em, 3.5vw, 3em);
 }
 
 .ff-one-player {
@@ -875,7 +875,7 @@ input[type="number"] {
 }
 
 .ff-player-points {
-    background-color: var(--bg-color2);
+    background-color: var(--highlight);
     font-size: clamp(2em, 4vw, 3em);
     flex-grow: 1;
     display: flex;
@@ -884,7 +884,7 @@ input[type="number"] {
 }
 
 .ff-player-name {
-    background-color: var(--bg-color2);
+    background-color: var(--highlight);
     font-size: clamp(1em, 2vw, 2em);
 }
 
