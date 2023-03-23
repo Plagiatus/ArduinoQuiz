@@ -114,7 +114,7 @@
         {
             "question": "Nenne einen Cocktail",
             "answers": [
-                {"answer": "Sec on the Beach", "value": 25},
+                {"answer": "Sex on the Beach", "value": 25},
                 {"answer": "Pina Colada", "value": 14},
                 {"answer": "Mojito", "value": 14},
                 {"answer": "Caipirinha", "value": 9},

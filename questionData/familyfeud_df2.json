@@ -1,0 +1,115 @@
+{
+    "__source": "https://www.youtube.com/watch?v=OxMj8lKNc9s",
+    "questions": [
+        {
+            "question": "Nenne einen ikonischen Videospielbösewicht",
+            "answers": [
+                {"answer": "Bowser", "value": 48},
+                {"answer": "Ganondorf", "value": 19},
+                {"answer": "Sephiroth", "value": 11},
+                {"answer": "Joker", "value": 7},
+                {"answer": "Vaas Montenegro", "value": 5},
+                {"answer": "Wario", "value": 3}
+            ]
+        },
+        {
+            "question": "Nenne einen Film von Steven Spielberg",
+            "answers": [
+                {"answer": "E.T.", "value": 27},
+                {"answer": "Jurrassic Park", "value": 20},
+                {"answer": "Der Weiße Hai", "value": 1},
+                {"answer": "Indiana Jones", "value": 8},
+                {"answer": "James Ryan", "value": 5},
+                {"answer": "Schindlers List", "value": 3}
+            ]
+        },
+        {
+            "question": "Nenne einen Song von Scooter",
+            "answers": [
+                {"answer": "Hyper Hyper", "value": 42},
+                {"answer": "How much is the fish", "value": 28},
+                {"answer": "Maria (I like it loud)", "value": 11},
+                {"answer": "Nessaja", "value": 8},
+                {"answer": "J'adore hardcore", "value": 4},
+                {"answer": "Move your ass", "value": 2}
+            ]
+        },
+        {
+            "question": "Nenne etwas, das man mit einem Löffel isst",
+            "answers": [
+                {"answer": "Suppe", "value": 47},
+                {"answer": "Eis", "value": 21},
+                {"answer": "Joghurt", "value": 19},
+                {"answer": "Müsli", "value": 6},
+                {"answer": "Pudding", "value": 4},
+                {"answer": "Nutella", "value": 2}
+            ]
+        },
+        {
+            "question": "Nenne ein typisches Mordwerkzeug",
+            "answers": [
+                {"answer": "Messer", "value": 60},
+                {"answer": "Axt", "value": 15},
+                {"answer": "Pistole", "value": 6},
+                {"answer": "Gift", "value": 5},
+                {"answer": "Hammer", "value": 3},
+                {"answer": "Pfanne", "value": 2}
+            ]
+        },
+        {
+            "question": "Nenne einen typisch deutschen Männer-Vornamen",
+            "answers": [
+                {"answer": "Peter", "value": 15},
+                {"answer": "Klaus", "value": 11},
+                {"answer": "Hans", "value": 9},
+                {"answer": "Horst", "value": 7},
+                {"answer": "Jürgen", "value": 6},
+                {"answer": "Michael", "value": 4}
+            ]
+        },
+        {
+            "question": "Nenne eine bekannte Whisky-Marke",
+            "answers": [
+                {"answer": "Jack Daniels", "value": 45},
+                {"answer": "Jim Bean", "value": 18},
+                {"answer": "Glenfiddich", "value": 9},
+                {"answer": "Johnny Walker", "value": 6},
+                {"answer": "Ballantines", "value": 4},
+                {"answer": "Jameson", "value": 3}
+            ]
+        },
+        {
+            "question": "Nenne etwas, das man im Nachschrank aufbewahrt",
+            "answers": [
+                {"answer": "Sexspielzeug ", "value": 30},
+                {"answer": "Kondome", "value": 26},
+                {"answer": "Taschentücher", "value": 17},
+                {"answer": "Medikamente", "value": 9},
+                {"answer": "Bücher", "value": 5},
+                {"answer": "Taschenlampe", "value": 2}
+            ]
+        },
+        {
+            "question": "Nenne eine App, die jeder auf dem Smartphone hat",
+            "answers": [
+                {"answer": "Whatsapp", "value": 43},
+                {"answer": "Instagram", "value": 18},
+                {"answer": "Google Maps", "value": 14},
+                {"answer": "Taschenrechner", "value": 3},
+                {"answer": "Youtube", "value": 6},
+                {"answer": "Spotify", "value": 3}
+            ]
+        },
+        {
+            "question": "Nenne ein Land, das auf Land ended.",
+            "answers": [
+                {"answer": "Deutschland", "value": 38},
+                {"answer": "England", "value": 17},
+                {"answer": "Finnland", "value": 12},
+                {"answer": "Lettland", "value": 8},
+                {"answer": "Russland", "value": 5},
+                {"answer": "Griechenland", "value": 4}
+            ]
+        }
+    ]
+}
