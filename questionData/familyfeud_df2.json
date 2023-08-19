@@ -17,7 +17,7 @@
             "answers": [
                 {"answer": "E.T.", "value": 27},
                 {"answer": "Jurrassic Park", "value": 20},
-                {"answer": "Der Weiße Hai", "value": 1},
+                {"answer": "Der Weiße Hai", "value": 17},
                 {"answer": "Indiana Jones", "value": 8},
                 {"answer": "James Ryan", "value": 5},
                 {"answer": "Schindlers List", "value": 3}
@@ -68,7 +68,7 @@
             ]
         },
         {
-            "question": "Nenne eine bekannte Whisky-Marke",
+            "question": "Nenne eine bekannte Whiskey-Marke",
             "answers": [
                 {"answer": "Jack Daniels", "value": 45},
                 {"answer": "Jim Bean", "value": 18},
@@ -79,7 +79,7 @@
             ]
         },
         {
-            "question": "Nenne etwas, das man im Nachschrank aufbewahrt",
+            "question": "Nenne etwas, das man im Nachtschrank aufbewahrt",
             "answers": [
                 {"answer": "Sexspielzeug ", "value": 30},
                 {"answer": "Kondome", "value": 26},
@@ -95,8 +95,8 @@
                 {"answer": "Whatsapp", "value": 43},
                 {"answer": "Instagram", "value": 18},
                 {"answer": "Google Maps", "value": 14},
-                {"answer": "Taschenrechner", "value": 3},
                 {"answer": "Youtube", "value": 6},
+                {"answer": "Taschenrechner", "value": 3},
                 {"answer": "Spotify", "value": 3}
             ]
         },
